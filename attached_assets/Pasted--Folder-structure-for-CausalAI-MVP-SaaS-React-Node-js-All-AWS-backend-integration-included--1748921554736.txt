@@ -1,0 +1,86 @@
+/*
+Folder structure for CausalAI MVP SaaS (React + Node.js)
+All AWS backend integration included
+*/
+
+causal-ai-mvp/
+├── backend/
+│   ├── controllers/
+│   │   ├── dataUploadController.js      // Handles CSV parsing & validation
+│   │   ├── causalGraphController.js     // Handles saving/validating causal links
+│   │   ├── trainModelController.js      // Sends job to AWS SageMaker
+│   │   └── simulateScenarioController.js// Runs shock/intervention simulations
+│   ├── routes/
+│   │   ├── upload.js
+│   │   ├── graph.js
+│   │   ├── train.js
+│   │   └── simulate.js
+│   ├── utils/
+│   │   ├── s3Client.js                 // S3 Upload
+│   │   ├── sagemakerClient.js          // SageMaker inference + training
+│   │   └── summaryGen.js               // Uses AWS Bedrock or fallback LLM
+│   ├── app.js                         // Express app
+│   └── server.js                      // Entry point
+├── frontend/
+│   ├── public/
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── UploadData.jsx
+│   │   │   ├── CausalBuilder.jsx       // Drag-and-drop causal editor
+│   │   │   ├── SimulationPanel.jsx     // Intervention input
+│   │   │   └── ResultsViewer.jsx       // Summary + Graphs
+│   │   ├── pages/
+│   │   │   ├── Home.jsx
+│   │   │   ├── Dashboard.jsx
+│   │   │   └── Results.jsx
+│   │   ├── App.jsx
+│   │   └── index.js
+├── terraform/
+│   ├── main.tf                         // AWS services setup
+│   ├── variables.tf
+│   └── outputs.tf
+├── .env                                // AWS keys & settings
+├── package.json
+├── README.md
+└── replit.nix (optional for Replit build)
+
+/* Sample: terraform/main.tf */
+provider "aws" {
+  region = "us-east-1"
+}
+
+resource "aws_s3_bucket" "causalai_bucket" {
+  bucket = "causalai-user-data"
+  force_destroy = true
+}
+
+resource "aws_iam_role" "sagemaker_exec" {
+  name = "causalai-sagemaker-role"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Action = "sts:AssumeRole",
+        Effect = "Allow",
+        Principal = {
+          Service = "sagemaker.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
+
+resource "aws_sagemaker_notebook_instance" "causalai_nb" {
+  name                 = "causalai-notebook"
+  instance_type        = "ml.t2.medium"
+  role_arn             = aws_iam_role.sagemaker_exec.arn
+  lifecycle_config_name = null
+}
+
+output "s3_bucket_name" {
+  value = aws_s3_bucket.causalai_bucket.id
+}
+
+output "sagemaker_role_arn" {
+  value = aws_iam_role.sagemaker_exec.arn
+}
