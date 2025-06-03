@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -31,6 +31,9 @@ export default function StockPredictionDashboard({ project }: StockPredictionDas
   const [predictionData, setPredictionData] = useState<PredictionData | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [timeHorizon, setTimeHorizon] = useState("30");
+  const [hoveredPoint, setHoveredPoint] = useState<{ x: number; y: number; price: number; date: string; type: 'historical' | 'predicted' } | null>(null);
+  const [selectedPoint, setSelectedPoint] = useState<{ price: number; date: string; type: 'historical' | 'predicted' } | null>(null);
+  const svgRef = useRef<SVGSVGElement>(null);
 
   const generatePrediction = async () => {
     setIsGenerating(true);
@@ -130,6 +133,78 @@ export default function StockPredictionDashboard({ project }: StockPredictionDas
 
   const formatPrice = (price: number) => `$${price.toFixed(2)}`;
   const formatPercentage = (value: number) => `${value > 0 ? '+' : ''}${value.toFixed(1)}%`;
+
+  const handleMouseMove = (event: React.MouseEvent<SVGSVGElement>) => {
+    if (!predictionData || !svgRef.current) return;
+    
+    const rect = svgRef.current.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    
+    // Convert screen coordinates to SVG coordinates
+    const svgX = (x / rect.width) * 800;
+    const svgY = (y / rect.height) * 400;
+    
+    // Check if we're in the chart area
+    if (svgX >= 80 && svgX <= 760 && svgY >= 20 && svgY <= 360) {
+      const chartX = svgX - 80;
+      const chartY = svgY - 20;
+      
+      // Find the closest data point
+      let closestPoint = null;
+      let minDistance = Infinity;
+      
+      // Check historical points
+      predictionData.historicalPrices.forEach((point, i) => {
+        const pointX = (i / (predictionData.historicalPrices.length - 1)) * 340;
+        const pointY = 340 - ((point.price - 35) / 20) * 340;
+        const distance = Math.sqrt(Math.pow(chartX - pointX, 2) + Math.pow(chartY - pointY, 2));
+        
+        if (distance < minDistance && distance < 20) {
+          minDistance = distance;
+          closestPoint = {
+            x: svgX,
+            y: svgY,
+            price: point.price,
+            date: point.date,
+            type: 'historical' as const
+          };
+        }
+      });
+      
+      // Check predicted points
+      predictionData.predictedPrices.forEach((point, i) => {
+        const pointX = 340 + (i / (predictionData.predictedPrices.length - 1)) * 340;
+        const pointY = 340 - ((point.price - 35) / 20) * 340;
+        const distance = Math.sqrt(Math.pow(chartX - pointX, 2) + Math.pow(chartY - pointY, 2));
+        
+        if (distance < minDistance && distance < 20) {
+          minDistance = distance;
+          closestPoint = {
+            x: svgX,
+            y: svgY,
+            price: point.price,
+            date: point.date,
+            type: 'predicted' as const
+          };
+        }
+      });
+      
+      setHoveredPoint(closestPoint);
+    } else {
+      setHoveredPoint(null);
+    }
+  };
+
+  const handleClick = (event: React.MouseEvent<SVGSVGElement>) => {
+    if (hoveredPoint) {
+      setSelectedPoint({
+        price: hoveredPoint.price,
+        date: hoveredPoint.date,
+        type: hoveredPoint.type
+      });
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -294,52 +369,200 @@ export default function StockPredictionDashboard({ project }: StockPredictionDas
               <TabsContent value="chart" className="space-y-6">
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-lg">Price Prediction Chart</CardTitle>
+                    <CardTitle className="text-lg">Interactive Price Prediction Chart</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="h-96 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/50 dark:to-indigo-950/50 rounded-lg flex items-center justify-center border border-blue-200 dark:border-blue-800">
-                      <div className="text-center">
-                        <TrendingUp className="h-12 w-12 text-blue-500 mx-auto mb-4" />
-                        <h4 className="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-2">
-                          Interactive Stock Price Chart
-                        </h4>
-                        <p className="text-sm text-blue-700 dark:text-blue-300 mb-4">
-                          Historical data (30 days) + Predicted prices ({timeHorizon} days forward)
-                        </p>
-                        <div className="grid grid-cols-3 gap-4 text-xs">
-                          <div className="p-2 bg-blue-100 dark:bg-blue-900/50 rounded">
-                            <div className="font-medium">Historical</div>
-                            <div className="text-blue-600">Actual prices</div>
-                          </div>
-                          <div className="p-2 bg-green-100 dark:bg-green-900/50 rounded">
-                            <div className="font-medium">Predicted</div>
-                            <div className="text-green-600">ML forecast</div>
-                          </div>
-                          <div className="p-2 bg-purple-100 dark:bg-purple-900/50 rounded">
-                            <div className="font-medium">Confidence</div>
-                            <div className="text-purple-600">Upper/lower bounds</div>
-                          </div>
-                        </div>
-                      </div>
+                    <div className="h-96 relative bg-white dark:bg-gray-900 rounded-lg border">
+                      <svg
+                        ref={svgRef}
+                        className="w-full h-full cursor-crosshair"
+                        viewBox="0 0 800 400"
+                        preserveAspectRatio="xMidYMid meet"
+                        onMouseMove={handleMouseMove}
+                        onMouseLeave={() => setHoveredPoint(null)}
+                        onClick={handleClick}
+                      >
+                        {/* Grid lines */}
+                        <defs>
+                          <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#e5e7eb" strokeWidth="1"/>
+                          </pattern>
+                        </defs>
+                        <rect width="100%" height="100%" fill="url(#grid)" />
+                        
+                        {/* Chart area */}
+                        <g transform="translate(80, 20)">
+                          {/* Y-axis */}
+                          <line x1="0" y1="0" x2="0" y2="340" stroke="#374151" strokeWidth="2" />
+                          {/* X-axis */}
+                          <line x1="0" y1="340" x2="680" y2="340" stroke="#374151" strokeWidth="2" />
+                          
+                          {/* Y-axis labels */}
+                          {[35, 40, 45, 50, 55].map((price, i) => (
+                            <g key={price}>
+                              <line x1="-5" y1={340 - (i * 68)} x2="0" y2={340 - (i * 68)} stroke="#374151" strokeWidth="1" />
+                              <text x="-10" y={340 - (i * 68) + 5} textAnchor="end" fontSize="12" fill="#6b7280">
+                                ${price}
+                              </text>
+                            </g>
+                          ))}
+                          
+                          {/* Historical data line */}
+                          <path
+                            d={predictionData.historicalPrices.map((point, i) => {
+                              const x = (i / (predictionData.historicalPrices.length - 1)) * 340;
+                              const y = 340 - ((point.price - 35) / 20) * 340;
+                              return `${i === 0 ? 'M' : 'L'} ${x} ${y}`;
+                            }).join(' ')}
+                            fill="none"
+                            stroke="#3b82f6"
+                            strokeWidth="3"
+                          />
+                          
+                          {/* Predicted data line */}
+                          <path
+                            d={predictionData.predictedPrices.map((point, i) => {
+                              const x = 340 + (i / (predictionData.predictedPrices.length - 1)) * 340;
+                              const y = 340 - ((point.price - 35) / 20) * 340;
+                              return `${i === 0 ? 'M' : 'L'} ${x} ${y}`;
+                            }).join(' ')}
+                            fill="none"
+                            stroke="#10b981"
+                            strokeWidth="3"
+                            strokeDasharray="5,5"
+                          />
+                          
+                          {/* Confidence interval */}
+                          <path
+                            d={`M ${340} ${340 - ((predictionData.predictedPrices[0].confidence.lower - 35) / 20) * 340} 
+                                ${predictionData.predictedPrices.map((point, i) => {
+                                  const x = 340 + (i / (predictionData.predictedPrices.length - 1)) * 340;
+                                  const y = 340 - ((point.confidence.lower - 35) / 20) * 340;
+                                  return `L ${x} ${y}`;
+                                }).join(' ')}
+                                ${predictionData.predictedPrices.slice().reverse().map((point, i) => {
+                                  const x = 340 + ((predictionData.predictedPrices.length - 1 - i) / (predictionData.predictedPrices.length - 1)) * 340;
+                                  const y = 340 - ((point.confidence.upper - 35) / 20) * 340;
+                                  return `L ${x} ${y}`;
+                                }).join(' ')} Z`}
+                            fill="rgba(16, 185, 129, 0.1)"
+                            stroke="none"
+                          />
+                          
+                          {/* Data points */}
+                          {predictionData.historicalPrices.slice(-5).map((point, i) => {
+                            const x = ((predictionData.historicalPrices.length - 5 + i) / (predictionData.historicalPrices.length - 1)) * 340;
+                            const y = 340 - ((point.price - 35) / 20) * 340;
+                            return (
+                              <circle
+                                key={i}
+                                cx={x}
+                                cy={y}
+                                r="4"
+                                fill="#3b82f6"
+                                stroke="white"
+                                strokeWidth="2"
+                              />
+                            );
+                          })}
+                          
+                          {predictionData.predictedPrices.slice(0, 5).map((point, i) => {
+                            const x = 340 + (i / (predictionData.predictedPrices.length - 1)) * 340;
+                            const y = 340 - ((point.price - 35) / 20) * 340;
+                            return (
+                              <circle
+                                key={i}
+                                cx={x}
+                                cy={y}
+                                r="4"
+                                fill="#10b981"
+                                stroke="white"
+                                strokeWidth="2"
+                              />
+                            );
+                          })}
+                          
+                          {/* Divider line */}
+                          <line x1="340" y1="0" x2="340" y2="340" stroke="#ef4444" strokeWidth="2" strokeDasharray="3,3" />
+                          
+                          {/* Legend */}
+                          <g transform="translate(400, 30)">
+                            <rect x="0" y="0" width="200" height="80" fill="rgba(255,255,255,0.9)" stroke="#e5e7eb" rx="4" />
+                            <line x1="10" y1="20" x2="30" y2="20" stroke="#3b82f6" strokeWidth="3" />
+                            <text x="35" y="25" fontSize="12" fill="#374151">Historical Prices</text>
+                            <line x1="10" y1="40" x2="30" y2="40" stroke="#10b981" strokeWidth="3" strokeDasharray="5,5" />
+                            <text x="35" y="45" fontSize="12" fill="#374151">Predicted Prices</text>
+                            <rect x="10" y="55" width="20" height="8" fill="rgba(16, 185, 129, 0.2)" />
+                            <text x="35" y="63" fontSize="12" fill="#374151">Confidence Band</text>
+                          </g>
+                          
+                          {/* Current price indicator */}
+                          <g transform="translate(340, 0)">
+                            <text x="5" y="15" fontSize="12" fill="#ef4444" fontWeight="bold">Current: ${predictionData.executiveSummary.currentPrice.toFixed(2)}</text>
+                          </g>
+                        </g>
+                        
+                        {/* X-axis labels */}
+                        <g transform="translate(80, 370)">
+                          <text x="85" y="15" textAnchor="middle" fontSize="12" fill="#6b7280">-30d</text>
+                          <text x="170" y="15" textAnchor="middle" fontSize="12" fill="#6b7280">-15d</text>
+                          <text x="340" y="15" textAnchor="middle" fontSize="12" fill="#ef4444" fontWeight="bold">Today</text>
+                          <text x="510" y="15" textAnchor="middle" fontSize="12" fill="#6b7280">+15d</text>
+                          <text x="680" y="15" textAnchor="middle" fontSize="12" fill="#6b7280">+{timeHorizon}d</text>
+                        </g>
+                        
+                        {/* Hover tooltip */}
+                        {hoveredPoint && (
+                          <g transform={`translate(${hoveredPoint.x}, ${hoveredPoint.y})`}>
+                            <rect
+                              x="-50"
+                              y="-35"
+                              width="100"
+                              height="30"
+                              fill="rgba(0,0,0,0.8)"
+                              stroke="white"
+                              strokeWidth="1"
+                              rx="4"
+                            />
+                            <text x="0" y="-20" textAnchor="middle" fontSize="10" fill="white" fontWeight="bold">
+                              {formatPrice(hoveredPoint.price)}
+                            </text>
+                            <text x="0" y="-10" textAnchor="middle" fontSize="8" fill="#ccc">
+                              {new Date(hoveredPoint.date).toLocaleDateString()}
+                            </text>
+                            <circle cx="0" cy="0" r="6" fill={hoveredPoint.type === 'historical' ? '#3b82f6' : '#10b981'} stroke="white" strokeWidth="2" />
+                          </g>
+                        )}
+                        
+                        {/* Selected point indicator */}
+                        {selectedPoint && (
+                          <g transform="translate(80, 380)">
+                            <rect x="0" y="0" width="300" height="25" fill="rgba(59, 130, 246, 0.1)" stroke="#3b82f6" rx="4" />
+                            <text x="10" y="16" fontSize="12" fill="#3b82f6" fontWeight="bold">
+                              Selected: {formatPrice(selectedPoint.price)} on {new Date(selectedPoint.date).toLocaleDateString()} ({selectedPoint.type})
+                            </text>
+                          </g>
+                        )}
+                      </svg>
                     </div>
                     
-                    <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                      <div className="text-center">
+                    <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                      <div className="text-center p-3 bg-blue-50 dark:bg-blue-950/50 rounded-lg">
                         <div className="font-medium text-foreground">Price Range</div>
                         <div className="text-muted-foreground">
                           {formatPrice(Math.min(...predictionData.predictedPrices.map(p => p.confidence.lower)))} - 
                           {formatPrice(Math.max(...predictionData.predictedPrices.map(p => p.confidence.upper)))}
                         </div>
                       </div>
-                      <div className="text-center">
+                      <div className="text-center p-3 bg-purple-50 dark:bg-purple-950/50 rounded-lg">
                         <div className="font-medium text-foreground">Volatility</div>
                         <div className="text-muted-foreground">±25%</div>
                       </div>
-                      <div className="text-center">
+                      <div className="text-center p-3 bg-green-50 dark:bg-green-950/50 rounded-lg">
                         <div className="font-medium text-foreground">Trend</div>
                         <div className="text-muted-foreground">{predictionData.executiveSummary.outlook}</div>
                       </div>
-                      <div className="text-center">
+                      <div className="text-center p-3 bg-orange-50 dark:bg-orange-950/50 rounded-lg">
                         <div className="font-medium text-foreground">Timeline</div>
                         <div className="text-muted-foreground">{timeHorizon} days</div>
                       </div>
