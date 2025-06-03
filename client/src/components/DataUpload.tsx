@@ -129,7 +129,7 @@ export default function DataUpload({ project }: DataUploadProps) {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-        {project.dataRows === 0 ? (
+        {(project.dataRows || 0) === 0 ? (
           <>
             <div
               className={cn(
