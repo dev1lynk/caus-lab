@@ -88,11 +88,16 @@ export default function InterventionSimulator({ project, isPremium = false }: In
   ];
 
   const createNewIntervention = () => {
+    if (!project.variables || project.variables.length === 0) {
+      alert("Please upload data and configure variables first to create interventions.");
+      return;
+    }
+    
     const newIntervention: Intervention = {
       id: `intervention-${Date.now()}`,
       name: "Custom Intervention",
       type: "gradual",
-      targetVariable: project.variables[0]?.id || "",
+      targetVariable: project.variables[0].id,
       changeType: "percentage",
       changeValue: 10,
       duration: 30,
@@ -103,11 +108,19 @@ export default function InterventionSimulator({ project, isPremium = false }: In
   };
 
   const loadTemplate = (template: typeof interventionTemplates[0]) => {
+    if (!project.variables || project.variables.length === 0) {
+      alert("Please upload data and configure variables first to load intervention templates.");
+      return;
+    }
+    
+    // Find the target variable or use the first available variable
+    const targetVar = project.variables.find(v => v.name.toLowerCase().includes(template.targetVariable.toLowerCase())) || project.variables[0];
+    
     const intervention: Intervention = {
       id: `intervention-${Date.now()}`,
       name: template.name,
       type: template.type,
-      targetVariable: template.targetVariable,
+      targetVariable: targetVar.id,
       changeType: template.changeType,
       changeValue: template.changeValue,
       duration: template.duration,
@@ -126,6 +139,11 @@ export default function InterventionSimulator({ project, isPremium = false }: In
 
   const runSimulation = async () => {
     if (!isPremium) return;
+    
+    if (!project.variables || project.variables.length === 0) {
+      alert("Please upload data and configure variables first to run simulations.");
+      return;
+    }
     
     setIsSimulating(true);
     
@@ -158,7 +176,7 @@ export default function InterventionSimulator({ project, isPremium = false }: In
   };
 
   const getVariableName = (variableId: string) => {
-    return project.variables.find(v => v.id === variableId)?.name || variableId;
+    return project.variables?.find(v => v.id === variableId)?.name || variableId;
   };
 
   if (!isPremium) {
@@ -262,11 +280,11 @@ export default function InterventionSimulator({ project, isPremium = false }: In
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            {project.variables.filter(v => v.type === 'input' || v.type === 'external').map((variable) => (
+                            {project.variables?.filter(v => v.type === 'input' || v.type === 'external').map((variable) => (
                               <SelectItem key={variable.id} value={variable.id}>
                                 {variable.name}
                               </SelectItem>
-                            ))}
+                            )) || []}
                           </SelectContent>
                         </Select>
                       </div>
