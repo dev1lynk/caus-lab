@@ -23,9 +23,14 @@ const variableTypeLabels = {
   external: "External",
 };
 
-export default function VariableConfiguration({ project }: VariableConfigurationProps) {
+interface VariableConfigurationProps {
+  project: Project;
+  isPremium?: boolean;
+}
+
+export default function VariableConfiguration({ project, isPremium = false }: VariableConfigurationProps) {
   const variables = project.variables || [];
-  const maxVariables = 5; // Free plan limit
+  const maxVariables = isPremium ? 50 : 5;
 
   return (
     <Card className="animate-fade-in">
