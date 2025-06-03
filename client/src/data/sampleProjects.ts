@@ -355,8 +355,254 @@ export const chipDesignProject: SampleProject = {
   ]
 };
 
+// Stock Price Prediction Sample Project
+export const stockPredictionProject: SampleProject = {
+  id: "semiconductor-stock-prediction",
+  name: "Semiconductor Stock Price Prediction",
+  description: "Predict future stock prices using 16 key semiconductor industry variables including supply chain, market demand, and financial indicators",
+  industry: "Semiconductor",
+  variables: [
+    {
+      id: "st-stock-price",
+      name: "ST Stock Price",
+      type: "target",
+      color: "#3b82f6",
+      position: { x: 600, y: 200 },
+      description: "STMicroelectronics stock price (target variable)",
+      unit: "USD",
+      category: "financial"
+    },
+    {
+      id: "st-orders-shipment",
+      name: "ST Orders Shipment",
+      type: "input",
+      color: "#10b981",
+      position: { x: 100, y: 50 },
+      description: "Volume of orders and shipments",
+      unit: "units",
+      category: "production"
+    },
+    {
+      id: "crude-oil-price",
+      name: "Crude Oil Price",
+      type: "external",
+      color: "#ef4444",
+      position: { x: 100, y: 100 },
+      description: "Global crude oil price indicator",
+      unit: "USD/barrel",
+      category: "market"
+    },
+    {
+      id: "asml-stock-price",
+      name: "ASML Stock Price",
+      type: "input",
+      color: "#8b5cf6",
+      position: { x: 100, y: 150 },
+      description: "ASML Holdings stock price (equipment supplier)",
+      unit: "USD",
+      category: "financial"
+    },
+    {
+      id: "interest-rate",
+      name: "Interest Rate",
+      type: "external",
+      color: "#f59e0b",
+      position: { x: 100, y: 200 },
+      description: "Central bank interest rates",
+      unit: "%",
+      category: "financial"
+    },
+    {
+      id: "nasdaq-soxx",
+      name: "NASDAQ/SOXX",
+      type: "input",
+      color: "#06b6d4",
+      position: { x: 100, y: 250 },
+      description: "Semiconductor sector index",
+      unit: "index",
+      category: "market"
+    },
+    {
+      id: "global-chip-demand",
+      name: "Global Chip Demand Index",
+      type: "input",
+      color: "#84cc16",
+      position: { x: 100, y: 300 },
+      description: "Global semiconductor demand indicator",
+      unit: "index",
+      category: "market"
+    },
+    {
+      id: "st-export-data",
+      name: "ST Export Data",
+      type: "input",
+      color: "#f97316",
+      position: { x: 250, y: 50 },
+      description: "Export volume and revenue data",
+      unit: "USD millions",
+      category: "financial"
+    },
+    {
+      id: "st-inventory",
+      name: "ST Inventory",
+      type: "mediator",
+      color: "#ec4899",
+      position: { x: 250, y: 100 },
+      description: "Inventory levels and turnover",
+      unit: "units",
+      category: "production"
+    },
+    {
+      id: "st-forecast",
+      name: "ST Forecast",
+      type: "mediator",
+      color: "#6366f1",
+      position: { x: 250, y: 150 },
+      description: "Company's internal forecasts",
+      unit: "growth_%",
+      category: "financial"
+    },
+    {
+      id: "st-eps",
+      name: "ST EPS",
+      type: "mediator",
+      color: "#14b8a6",
+      position: { x: 250, y: 200 },
+      description: "Earnings per share",
+      unit: "USD",
+      category: "financial"
+    },
+    {
+      id: "st-forward-pe",
+      name: "ST Forward P/E",
+      type: "mediator",
+      color: "#f43f5e",
+      position: { x: 250, y: 250 },
+      description: "Forward price-to-earnings ratio",
+      unit: "ratio",
+      category: "financial"
+    },
+    {
+      id: "ti-stock-price",
+      name: "TI Stock Price",
+      type: "input",
+      color: "#8b5cf6",
+      position: { x: 250, y: 300 },
+      description: "Texas Instruments stock price",
+      unit: "USD",
+      category: "financial"
+    },
+    {
+      id: "infineon-stock-price",
+      name: "Infineon Stock Price",
+      type: "input",
+      color: "#06b6d4",
+      position: { x: 400, y: 50 },
+      description: "Infineon Technologies stock price",
+      unit: "EUR",
+      category: "financial"
+    },
+    {
+      id: "st-revenues",
+      name: "ST Revenues",
+      type: "input",
+      color: "#84cc16",
+      position: { x: 400, y: 100 },
+      description: "Quarterly revenue figures",
+      unit: "USD millions",
+      category: "financial"
+    },
+    {
+      id: "infineon-shipments",
+      name: "Infineon Shipments",
+      type: "input",
+      color: "#f97316",
+      position: { x: 400, y: 150 },
+      description: "Infineon's shipment volumes",
+      unit: "units",
+      category: "production"
+    }
+  ],
+  causalLinks: [
+    { id: "link1", source: "st-orders-shipment", target: "st-revenues", strength: 85 },
+    { id: "link2", source: "st-revenues", target: "st-eps", strength: 80 },
+    { id: "link3", source: "st-eps", target: "st-stock-price", strength: 90 },
+    { id: "link4", source: "nasdaq-soxx", target: "st-stock-price", strength: 75 },
+    { id: "link5", source: "global-chip-demand", target: "st-orders-shipment", strength: 70 },
+    { id: "link6", source: "asml-stock-price", target: "st-stock-price", strength: 65 },
+    { id: "link7", source: "interest-rate", target: "st-forward-pe", strength: 60 },
+    { id: "link8", source: "st-forward-pe", target: "st-stock-price", strength: 55 },
+    { id: "link9", source: "crude-oil-price", target: "global-chip-demand", strength: 45 },
+    { id: "link10", source: "st-inventory", target: "st-forecast", strength: 50 },
+    { id: "link11", source: "st-forecast", target: "st-stock-price", strength: 40 },
+    { id: "link12", source: "ti-stock-price", target: "st-stock-price", strength: 35 },
+    { id: "link13", source: "infineon-stock-price", target: "st-stock-price", strength: 30 },
+    { id: "link14", source: "infineon-shipments", target: "global-chip-demand", strength: 25 }
+  ],
+  sampleData: [
+    {
+      Date: "2024-01-01",
+      "ST Stock Price": 42.15,
+      "ST Orders Shipment": 125000,
+      "Crude Oil Price": 78.50,
+      "ASML Stock Price": 652.30,
+      "Interest Rate": 4.25,
+      "NASDAQ/SOXX": 285.40,
+      "Global Chip Demand Index": 118.5,
+      "ST Export Data": 3250,
+      "ST Inventory": 85000,
+      "ST Forecast": 8.5,
+      "ST EPS": 2.45,
+      "ST Forward P/E": 17.2,
+      "TI Stock Price": 168.75,
+      "Infineon Stock Price": 32.80,
+      "ST Revenues": 4250,
+      "Infineon Shipments": 95000
+    },
+    {
+      Date: "2024-01-02",
+      "ST Stock Price": 41.95,
+      "ST Orders Shipment": 122000,
+      "Crude Oil Price": 79.20,
+      "ASML Stock Price": 648.90,
+      "Interest Rate": 4.25,
+      "NASDAQ/SOXX": 283.10,
+      "Global Chip Demand Index": 117.8,
+      "ST Export Data": 3180,
+      "ST Inventory": 87000,
+      "ST Forecast": 8.2,
+      "ST EPS": 2.42,
+      "ST Forward P/E": 17.3,
+      "TI Stock Price": 167.20,
+      "Infineon Stock Price": 32.45,
+      "ST Revenues": 4180,
+      "Infineon Shipments": 93000
+    },
+    {
+      Date: "2024-01-03",
+      "ST Stock Price": 43.25,
+      "ST Orders Shipment": 128000,
+      "Crude Oil Price": 77.80,
+      "ASML Stock Price": 658.40,
+      "Interest Rate": 4.20,
+      "NASDAQ/SOXX": 287.90,
+      "Global Chip Demand Index": 119.2,
+      "ST Export Data": 3320,
+      "ST Inventory": 83000,
+      "ST Forecast": 8.8,
+      "ST EPS": 2.48,
+      "ST Forward P/E": 17.4,
+      "TI Stock Price": 170.15,
+      "Infineon Stock Price": 33.10,
+      "ST Revenues": 4320,
+      "Infineon Shipments": 97000
+    }
+  ]
+};
+
 export const sampleProjects = [
   semiconductorProject,
   supplyChainProject,
-  chipDesignProject
+  chipDesignProject,
+  stockPredictionProject
 ];

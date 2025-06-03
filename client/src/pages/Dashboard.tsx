@@ -10,6 +10,7 @@ import ScenarioSimulation from "@/components/ScenarioSimulation";
 import ResultsDashboard from "@/components/ResultsDashboard";
 import DocumentationSection from "@/components/DocumentationSection";
 import InterventionSimulator from "@/components/InterventionSimulator";
+import StockPredictionDashboard from "@/components/StockPredictionDashboard";
 import Footer from "@/components/Footer";
 import { useProject } from "@/hooks/useProject";
 import { Card, CardContent } from "@/components/ui/card";
@@ -97,8 +98,9 @@ export default function Dashboard() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="workflow">Project Workflow</TabsTrigger>
+            <TabsTrigger value="prediction">Stock Prediction</TabsTrigger>
             <TabsTrigger value="intervention">Intervention Simulator</TabsTrigger>
             <TabsTrigger value="samples">Sample Projects</TabsTrigger>
             <TabsTrigger value="documentation">Documentation</TabsTrigger>
@@ -137,6 +139,10 @@ export default function Dashboard() {
                 <ResultsDashboard project={project} />
               )}
             </div>
+          </TabsContent>
+
+          <TabsContent value="prediction" className="space-y-8">
+            <StockPredictionDashboard project={project} />
           </TabsContent>
 
           <TabsContent value="intervention" className="space-y-8">
