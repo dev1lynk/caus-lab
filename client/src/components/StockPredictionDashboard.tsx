@@ -33,6 +33,8 @@ export default function StockPredictionDashboard({ project }: StockPredictionDas
   const [timeHorizon, setTimeHorizon] = useState("30");
   const [hoveredPoint, setHoveredPoint] = useState<{ x: number; y: number; price: number; date: string; type: 'historical' | 'predicted' } | null>(null);
   const [selectedPoint, setSelectedPoint] = useState<{ price: number; date: string; type: 'historical' | 'predicted' } | null>(null);
+  const [variableAdjustments, setVariableAdjustments] = useState<Record<string, number>>({});
+  const [adjustedPrediction, setAdjustedPrediction] = useState<PredictionData | null>(null);
   const svgRef = useRef<SVGSVGElement>(null);
 
   const generatePrediction = async () => {
@@ -205,6 +207,67 @@ export default function StockPredictionDashboard({ project }: StockPredictionDas
       });
     }
   };
+
+  const adjustVariable = (variableName: string, change: number) => {
+    const newAdjustments = {
+      ...variableAdjustments,
+      [variableName]: change
+    };
+    setVariableAdjustments(newAdjustments);
+    
+    if (predictionData) {
+      calculateAdjustedPrediction(newAdjustments);
+    }
+  };
+
+  const calculateAdjustedPrediction = (adjustments: Record<string, number>) => {
+    if (!predictionData) return;
+
+    // Calculate the total impact of all variable adjustments
+    let totalPriceImpact = 0;
+    predictionData.variableImportance.forEach(variable => {
+      const adjustment = adjustments[variable.variable] || 0;
+      const weightedImpact = (adjustment / 100) * (variable.importance / 100) * 0.3; // Max 30% impact per variable
+      totalPriceImpact += weightedImpact;
+    });
+
+    // Create adjusted prediction data
+    const adjustedPredictedPrices = predictionData.predictedPrices.map(point => {
+      const adjustedPrice = point.price * (1 + totalPriceImpact);
+      return {
+        ...point,
+        price: adjustedPrice,
+        confidence: {
+          upper: point.confidence.upper * (1 + totalPriceImpact),
+          lower: point.confidence.lower * (1 + totalPriceImpact)
+        }
+      };
+    });
+
+    const finalAdjustedPrice = adjustedPredictedPrices[adjustedPredictedPrices.length - 1].price;
+    const adjustedPriceChange = ((finalAdjustedPrice - predictionData.executiveSummary.currentPrice) / predictionData.executiveSummary.currentPrice) * 100;
+
+    const adjustedData: PredictionData = {
+      ...predictionData,
+      predictedPrices: adjustedPredictedPrices,
+      executiveSummary: {
+        ...predictionData.executiveSummary,
+        predictedPrice: finalAdjustedPrice,
+        priceChange: adjustedPriceChange,
+        outlook: adjustedPriceChange > 0 ? "Bullish" : "Bearish"
+      }
+    };
+
+    setAdjustedPrediction(adjustedData);
+  };
+
+  const resetAdjustments = () => {
+    setVariableAdjustments({});
+    setAdjustedPrediction(null);
+  };
+
+  // Use adjusted prediction for charts if available, otherwise use original
+  const currentPredictionData = adjustedPrediction || predictionData;
 
   return (
     <div className="space-y-6">
@@ -409,8 +472,8 @@ export default function StockPredictionDashboard({ project }: StockPredictionDas
                           
                           {/* Historical data line */}
                           <path
-                            d={predictionData.historicalPrices.map((point, i) => {
-                              const x = (i / (predictionData.historicalPrices.length - 1)) * 340;
+                            d={currentPredictionData.historicalPrices.map((point, i) => {
+                              const x = (i / (currentPredictionData.historicalPrices.length - 1)) * 340;
                               const y = 340 - ((point.price - 35) / 20) * 340;
                               return `${i === 0 ? 'M' : 'L'} ${x} ${y}`;
                             }).join(' ')}
@@ -419,33 +482,49 @@ export default function StockPredictionDashboard({ project }: StockPredictionDas
                             strokeWidth="3"
                           />
                           
-                          {/* Predicted data line */}
+                          {/* Original predicted data line (if adjustments are made) */}
+                          {adjustedPrediction && (
+                            <path
+                              d={predictionData.predictedPrices.map((point, i) => {
+                                const x = 340 + (i / (predictionData.predictedPrices.length - 1)) * 340;
+                                const y = 340 - ((point.price - 35) / 20) * 340;
+                                return `${i === 0 ? 'M' : 'L'} ${x} ${y}`;
+                              }).join(' ')}
+                              fill="none"
+                              stroke="#9ca3af"
+                              strokeWidth="2"
+                              strokeDasharray="3,3"
+                              opacity="0.7"
+                            />
+                          )}
+                          
+                          {/* Current predicted data line */}
                           <path
-                            d={predictionData.predictedPrices.map((point, i) => {
-                              const x = 340 + (i / (predictionData.predictedPrices.length - 1)) * 340;
+                            d={currentPredictionData.predictedPrices.map((point, i) => {
+                              const x = 340 + (i / (currentPredictionData.predictedPrices.length - 1)) * 340;
                               const y = 340 - ((point.price - 35) / 20) * 340;
                               return `${i === 0 ? 'M' : 'L'} ${x} ${y}`;
                             }).join(' ')}
                             fill="none"
-                            stroke="#10b981"
+                            stroke={adjustedPrediction ? "#10b981" : "#10b981"}
                             strokeWidth="3"
-                            strokeDasharray="5,5"
+                            strokeDasharray={adjustedPrediction ? "none" : "5,5"}
                           />
                           
                           {/* Confidence interval */}
                           <path
-                            d={`M ${340} ${340 - ((predictionData.predictedPrices[0].confidence.lower - 35) / 20) * 340} 
-                                ${predictionData.predictedPrices.map((point, i) => {
-                                  const x = 340 + (i / (predictionData.predictedPrices.length - 1)) * 340;
+                            d={`M ${340} ${340 - ((currentPredictionData.predictedPrices[0].confidence.lower - 35) / 20) * 340} 
+                                ${currentPredictionData.predictedPrices.map((point, i) => {
+                                  const x = 340 + (i / (currentPredictionData.predictedPrices.length - 1)) * 340;
                                   const y = 340 - ((point.confidence.lower - 35) / 20) * 340;
                                   return `L ${x} ${y}`;
                                 }).join(' ')}
-                                ${predictionData.predictedPrices.slice().reverse().map((point, i) => {
-                                  const x = 340 + ((predictionData.predictedPrices.length - 1 - i) / (predictionData.predictedPrices.length - 1)) * 340;
+                                ${currentPredictionData.predictedPrices.slice().reverse().map((point, i) => {
+                                  const x = 340 + ((currentPredictionData.predictedPrices.length - 1 - i) / (currentPredictionData.predictedPrices.length - 1)) * 340;
                                   const y = 340 - ((point.confidence.upper - 35) / 20) * 340;
                                   return `L ${x} ${y}`;
                                 }).join(' ')} Z`}
-                            fill="rgba(16, 185, 129, 0.1)"
+                            fill={adjustedPrediction ? "rgba(16, 185, 129, 0.15)" : "rgba(16, 185, 129, 0.1)"}
                             stroke="none"
                           />
                           
@@ -574,37 +653,202 @@ export default function StockPredictionDashboard({ project }: StockPredictionDas
               <TabsContent value="variables" className="space-y-6">
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-lg">Variable Importance Analysis</CardTitle>
+                    <CardTitle className="text-lg flex items-center justify-between">
+                      Variable Impact Adjustment
+                      <div className="flex items-center space-x-2">
+                        {Object.keys(variableAdjustments).length > 0 && (
+                          <Button 
+                            onClick={resetAdjustments} 
+                            variant="outline" 
+                            size="sm"
+                            className="text-xs"
+                          >
+                            Reset All
+                          </Button>
+                        )}
+                        {adjustedPrediction && (
+                          <Badge variant="secondary" className="text-xs">
+                            Adjusted Prediction: {formatPrice(adjustedPrediction.executiveSummary.predictedPrice)}
+                          </Badge>
+                        )}
+                      </div>
+                    </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
-                      {predictionData.variableImportance.slice(0, 8).map((variable, index) => (
-                        <div key={index} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                          <div className="flex items-center flex-1">
-                            <div className="w-8 h-8 bg-primary/10 text-primary rounded-full flex items-center justify-center text-xs font-bold mr-3">
-                              {index + 1}
+                      <div className="grid grid-cols-1 gap-4">
+                        {predictionData.variableImportance.slice(0, 8).map((variable, index) => {
+                          const currentAdjustment = variableAdjustments[variable.variable] || 0;
+                          return (
+                            <div key={index} className="flex items-center justify-between p-4 bg-muted/50 rounded-lg border">
+                              <div className="flex items-center flex-1">
+                                <div className="w-8 h-8 bg-primary/10 text-primary rounded-full flex items-center justify-center text-xs font-bold mr-3">
+                                  {index + 1}
+                                </div>
+                                <div className="flex-1">
+                                  <div className="font-medium text-sm">{variable.variable}</div>
+                                  <div className="text-xs text-muted-foreground">{variable.impact}</div>
+                                  <div className="text-xs text-blue-600 mt-1">
+                                    Current adjustment: {currentAdjustment > 0 ? '+' : ''}{currentAdjustment}%
+                                  </div>
+                                </div>
+                              </div>
+                              
+                              <div className="flex items-center space-x-4">
+                                <div className="flex flex-col items-center">
+                                  <div className="text-xs text-muted-foreground mb-1">Importance</div>
+                                  <div className="w-16 bg-muted rounded-full h-2">
+                                    <div 
+                                      className="bg-primary h-2 rounded-full transition-all duration-500"
+                                      style={{ width: `${variable.importance}%` }}
+                                    />
+                                  </div>
+                                  <div className="text-xs font-medium mt-1">{variable.importance}%</div>
+                                </div>
+                                
+                                <div className="flex flex-col items-center">
+                                  <div className="text-xs text-muted-foreground mb-1">Adjust Variable</div>
+                                  <div className="flex items-center space-x-2">
+                                    <button
+                                      onClick={() => adjustVariable(variable.variable, Math.max(currentAdjustment - 5, -50))}
+                                      className="w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded text-xs font-bold"
+                                      disabled={currentAdjustment <= -50}
+                                    >
+                                      -
+                                    </button>
+                                    <div className="w-16 text-center">
+                                      <input
+                                        type="number"
+                                        value={currentAdjustment}
+                                        onChange={(e) => {
+                                          const value = Math.max(-50, Math.min(50, parseInt(e.target.value) || 0));
+                                          adjustVariable(variable.variable, value);
+                                        }}
+                                        className="w-full text-xs text-center border rounded px-1 py-1"
+                                        min="-50"
+                                        max="50"
+                                      />
+                                      <div className="text-xs text-muted-foreground">%</div>
+                                    </div>
+                                    <button
+                                      onClick={() => adjustVariable(variable.variable, Math.min(currentAdjustment + 5, 50))}
+                                      className="w-6 h-6 bg-green-500 hover:bg-green-600 text-white rounded text-xs font-bold"
+                                      disabled={currentAdjustment >= 50}
+                                    >
+                                      +
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
                             </div>
-                            <div>
-                              <div className="font-medium text-sm">{variable.variable}</div>
-                              <div className="text-xs text-muted-foreground">{variable.impact}</div>
-                            </div>
-                          </div>
-                          <div className="flex items-center space-x-3">
-                            <div className="w-24 bg-muted rounded-full h-2">
-                              <div 
-                                className="bg-primary h-2 rounded-full transition-all duration-500"
-                                style={{ width: `${variable.importance}%` }}
-                              />
-                            </div>
-                            <div className="text-sm font-medium w-12 text-right">
-                              {variable.importance}%
-                            </div>
-                          </div>
-                        </div>
-                      ))}
+                          );
+                        })}
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
+
+                {/* Variable Impact Comparison Chart */}
+                {adjustedPrediction && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg">Prediction Comparison</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="h-64 bg-white dark:bg-gray-900 rounded-lg border">
+                        <svg className="w-full h-full" viewBox="0 0 600 250" preserveAspectRatio="xMidYMid meet">
+                          {/* Chart background */}
+                          <rect width="100%" height="100%" fill="url(#grid)" />
+                          
+                          <g transform="translate(60, 20)">
+                            {/* Axes */}
+                            <line x1="0" y1="0" x2="0" y2="200" stroke="#374151" strokeWidth="2" />
+                            <line x1="0" y1="200" x2="480" y2="200" stroke="#374151" strokeWidth="2" />
+                            
+                            {/* Y-axis labels */}
+                            {[35, 40, 45, 50, 55].map((price, i) => (
+                              <g key={price}>
+                                <line x1="-5" y1={200 - (i * 40)} x2="0" y2={200 - (i * 40)} stroke="#374151" strokeWidth="1" />
+                                <text x="-10" y={200 - (i * 40) + 5} textAnchor="end" fontSize="10" fill="#6b7280">
+                                  ${price}
+                                </text>
+                              </g>
+                            ))}
+                            
+                            {/* Original prediction line */}
+                            <path
+                              d={predictionData.predictedPrices.map((point, i) => {
+                                const x = (i / (predictionData.predictedPrices.length - 1)) * 480;
+                                const y = 200 - ((point.price - 35) / 20) * 200;
+                                return `${i === 0 ? 'M' : 'L'} ${x} ${y}`;
+                              }).join(' ')}
+                              fill="none"
+                              stroke="#6b7280"
+                              strokeWidth="2"
+                              strokeDasharray="5,5"
+                            />
+                            
+                            {/* Adjusted prediction line */}
+                            <path
+                              d={adjustedPrediction.predictedPrices.map((point, i) => {
+                                const x = (i / (adjustedPrediction.predictedPrices.length - 1)) * 480;
+                                const y = 200 - ((point.price - 35) / 20) * 200;
+                                return `${i === 0 ? 'M' : 'L'} ${x} ${y}`;
+                              }).join(' ')}
+                              fill="none"
+                              stroke="#10b981"
+                              strokeWidth="3"
+                            />
+                            
+                            {/* Legend */}
+                            <g transform="translate(300, 30)">
+                              <rect x="0" y="0" width="150" height="50" fill="rgba(255,255,255,0.9)" stroke="#e5e7eb" rx="4" />
+                              <line x1="10" y1="15" x2="30" y2="15" stroke="#6b7280" strokeWidth="2" strokeDasharray="5,5" />
+                              <text x="35" y="19" fontSize="10" fill="#374151">Original Prediction</text>
+                              <line x1="10" y1="35" x2="30" y2="35" stroke="#10b981" strokeWidth="3" />
+                              <text x="35" y="39" fontSize="10" fill="#374151">Adjusted Prediction</text>
+                            </g>
+                            
+                            {/* Price difference indicator */}
+                            <g transform="translate(400, 50)">
+                              <rect x="0" y="0" width="120" height="40" fill="rgba(16, 185, 129, 0.1)" stroke="#10b981" rx="4" />
+                              <text x="60" y="15" textAnchor="middle" fontSize="10" fill="#10b981" fontWeight="bold">
+                                Price Difference
+                              </text>
+                              <text x="60" y="30" textAnchor="middle" fontSize="12" fill="#10b981" fontWeight="bold">
+                                {formatPrice(adjustedPrediction.executiveSummary.predictedPrice - predictionData.executiveSummary.predictedPrice)}
+                              </text>
+                            </g>
+                          </g>
+                          
+                          {/* X-axis labels */}
+                          <g transform="translate(60, 230)">
+                            <text x="0" y="15" textAnchor="middle" fontSize="10" fill="#6b7280">Start</text>
+                            <text x="240" y="15" textAnchor="middle" fontSize="10" fill="#6b7280">Mid</text>
+                            <text x="480" y="15" textAnchor="middle" fontSize="10" fill="#6b7280">End ({timeHorizon}d)</text>
+                          </g>
+                        </svg>
+                      </div>
+                      
+                      <div className="mt-4 grid grid-cols-3 gap-4 text-sm">
+                        <div className="text-center p-3 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
+                          <div className="font-medium text-foreground">Original Target</div>
+                          <div className="text-muted-foreground">{formatPrice(predictionData.executiveSummary.predictedPrice)}</div>
+                        </div>
+                        <div className="text-center p-3 bg-green-50 dark:bg-green-950/50 rounded-lg">
+                          <div className="font-medium text-foreground">Adjusted Target</div>
+                          <div className="text-green-600 font-bold">{formatPrice(adjustedPrediction.executiveSummary.predictedPrice)}</div>
+                        </div>
+                        <div className="text-center p-3 bg-blue-50 dark:bg-blue-950/50 rounded-lg">
+                          <div className="font-medium text-foreground">Impact</div>
+                          <div className={`font-bold ${adjustedPrediction.executiveSummary.priceChange > predictionData.executiveSummary.priceChange ? 'text-green-600' : 'text-red-600'}`}>
+                            {formatPercentage(adjustedPrediction.executiveSummary.priceChange - predictionData.executiveSummary.priceChange)}
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
               </TabsContent>
 
               <TabsContent value="insights" className="space-y-6">
