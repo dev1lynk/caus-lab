@@ -157,11 +157,13 @@
 }
 
 .connection-line.strong {
-  @apply stroke-primary stroke-4;
+  @apply stroke-primary;
+  stroke-width: 4;
 }
 
 .connection-line.medium {
-  @apply stroke-accent stroke-3;
+  @apply stroke-accent;
+  stroke-width: 3;
 }
 
 .connection-line.weak {
