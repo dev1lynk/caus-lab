@@ -30,6 +30,9 @@ export interface Variable {
   type: 'target' | 'input' | 'mediator' | 'external';
   color: string;
   position?: { x: number; y: number };
+  description?: string;
+  unit?: string;
+  category?: 'production' | 'supply_chain' | 'market' | 'technology' | 'financial';
 }
 
 export interface CausalLink {

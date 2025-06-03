@@ -1,5 +1,5 @@
 import { useParams } from "wouter";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Navigation from "@/components/Navigation";
 import ProgressSteps from "@/components/ProgressSteps";
 import DataUpload from "@/components/DataUpload";
@@ -8,10 +8,14 @@ import CausalDiagramBuilder from "@/components/CausalDiagramBuilder";
 import ModelTraining from "@/components/ModelTraining";
 import ScenarioSimulation from "@/components/ScenarioSimulation";
 import ResultsDashboard from "@/components/ResultsDashboard";
+import DocumentationSection from "@/components/DocumentationSection";
+import InterventionSimulator from "@/components/InterventionSimulator";
 import Footer from "@/components/Footer";
 import { useProject } from "@/hooks/useProject";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 
 export default function Dashboard() {
   const params = useParams();
