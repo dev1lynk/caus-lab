@@ -88,16 +88,16 @@ export default function InterventionSimulator({ project, isPremium = false }: In
   ];
 
   const createNewIntervention = () => {
-    if (!project.variables || project.variables.length === 0) {
-      alert("Please upload data and configure variables first to create interventions.");
-      return;
-    }
+    // Use default semiconductor variables if project variables aren't available
+    const defaultVariable = project.variables && project.variables.length > 0 
+      ? project.variables[0].id 
+      : "wafer-temp";
     
     const newIntervention: Intervention = {
       id: `intervention-${Date.now()}`,
       name: "Custom Intervention",
       type: "gradual",
-      targetVariable: project.variables[0].id,
+      targetVariable: defaultVariable,
       changeType: "percentage",
       changeValue: 10,
       duration: 30,
@@ -108,19 +108,23 @@ export default function InterventionSimulator({ project, isPremium = false }: In
   };
 
   const loadTemplate = (template: typeof interventionTemplates[0]) => {
-    if (!project.variables || project.variables.length === 0) {
-      alert("Please upload data and configure variables first to load intervention templates.");
-      return;
-    }
+    // Use project variables if available, otherwise use template defaults
+    let targetVariable = template.targetVariable;
     
-    // Find the target variable or use the first available variable
-    const targetVar = project.variables.find(v => v.name.toLowerCase().includes(template.targetVariable.toLowerCase())) || project.variables[0];
+    if (project.variables && project.variables.length > 0) {
+      const targetVar = project.variables.find(v => v.name.toLowerCase().includes(template.targetVariable.toLowerCase()));
+      if (targetVar) {
+        targetVariable = targetVar.id;
+      } else {
+        targetVariable = project.variables[0].id;
+      }
+    }
     
     const intervention: Intervention = {
       id: `intervention-${Date.now()}`,
       name: template.name,
       type: template.type,
-      targetVariable: targetVar.id,
+      targetVariable: targetVariable,
       changeType: template.changeType,
       changeValue: template.changeValue,
       duration: template.duration,
@@ -140,15 +144,17 @@ export default function InterventionSimulator({ project, isPremium = false }: In
   const runSimulation = async () => {
     if (!isPremium) return;
     
-    if (!project.variables || project.variables.length === 0) {
-      alert("Please upload data and configure variables first to run simulations.");
-      return;
-    }
-    
     setIsSimulating(true);
     
     // Simulate running interventions (mock implementation)
     await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    // Use project variables if available, otherwise use default semiconductor variables
+    const availableVariables = project.variables || [
+      { id: "wafer-temp", name: "Wafer Temperature" },
+      { id: "yield-rate", name: "Yield Rate" },
+      { id: "defect-density", name: "Defect Density" }
+    ];
     
     const mockResults: SimulationResult[] = interventions.map(intervention => ({
       intervention,
@@ -157,14 +163,14 @@ export default function InterventionSimulator({ project, isPremium = false }: In
           variable: intervention.targetVariable,
           change: intervention.changeValue
         },
-        secondary: project.variables.slice(0, 3).map(v => ({
+        secondary: availableVariables.slice(0, 3).map(v => ({
           variable: v.id,
           change: Math.random() * intervention.changeValue * 0.3
         }))
       },
       timeline: Array.from({ length: 30 }, (_, i) => ({
         date: new Date(Date.now() + i * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-        values: project.variables.reduce((acc, v) => {
+        values: availableVariables.reduce((acc, v) => {
           acc[v.id] = 100 + (Math.random() - 0.5) * 20;
           return acc;
         }, {} as Record<string, number>)

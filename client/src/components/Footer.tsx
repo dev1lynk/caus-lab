@@ -16,12 +16,6 @@ export default function Footer() {
             <a href="#" className="hover:text-foreground transition-colors">
               Support
             </a>
-            <a href="#" className="hover:text-foreground transition-colors">
-              Privacy
-            </a>
-            <a href="#" className="hover:text-foreground transition-colors">
-              Terms
-            </a>
           </div>
         </div>
       </div>

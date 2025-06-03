@@ -98,13 +98,30 @@ export default function Dashboard() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="workflow">Project Workflow</TabsTrigger>
-            <TabsTrigger value="prediction">Stock Prediction</TabsTrigger>
-            <TabsTrigger value="intervention">Intervention Simulator</TabsTrigger>
-            <TabsTrigger value="samples">Sample Projects</TabsTrigger>
-            <TabsTrigger value="documentation">Documentation</TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto">
+            <TabsList className="flex w-max min-w-full justify-start md:grid md:grid-cols-5 gap-1">
+              <TabsTrigger value="workflow" className="text-xs md:text-sm px-2 md:px-4 whitespace-nowrap">
+                <span className="hidden md:inline">Project Workflow</span>
+                <span className="md:hidden">Workflow</span>
+              </TabsTrigger>
+              <TabsTrigger value="prediction" className="text-xs md:text-sm px-2 md:px-4 whitespace-nowrap">
+                <span className="hidden md:inline">Stock Prediction</span>
+                <span className="md:hidden">Stock</span>
+              </TabsTrigger>
+              <TabsTrigger value="intervention" className="text-xs md:text-sm px-2 md:px-4 whitespace-nowrap">
+                <span className="hidden md:inline">Intervention Simulator</span>
+                <span className="md:hidden">Simulate</span>
+              </TabsTrigger>
+              <TabsTrigger value="samples" className="text-xs md:text-sm px-2 md:px-4 whitespace-nowrap">
+                <span className="hidden md:inline">Sample Projects</span>
+                <span className="md:hidden">Samples</span>
+              </TabsTrigger>
+              <TabsTrigger value="documentation" className="text-xs md:text-sm px-2 md:px-4 whitespace-nowrap">
+                <span className="hidden md:inline">Documentation</span>
+                <span className="md:hidden">Docs</span>
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="workflow" className="space-y-8">
             {/* Progress Steps */}
