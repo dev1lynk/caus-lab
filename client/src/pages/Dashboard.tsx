@@ -11,6 +11,7 @@ import ResultsDashboard from "@/components/ResultsDashboard";
 import DocumentationSection from "@/components/DocumentationSection";
 import InterventionSimulator from "@/components/InterventionSimulator";
 import StockPredictionDashboard from "@/components/StockPredictionDashboard";
+import CounterfactualAnalysis from "@/components/CounterfactualAnalysis";
 import Footer from "@/components/Footer";
 import { useProject } from "@/hooks/useProject";
 import { Card, CardContent } from "@/components/ui/card";
@@ -99,7 +100,7 @@ export default function Dashboard() {
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="overflow-x-auto">
-            <TabsList className="flex w-max min-w-full justify-start md:grid md:grid-cols-5 gap-1">
+            <TabsList className="flex w-max min-w-full justify-start md:grid md:grid-cols-6 gap-1">
               <TabsTrigger value="workflow" className="text-xs md:text-sm px-2 md:px-4 whitespace-nowrap">
                 <span className="hidden md:inline">Project Workflow</span>
                 <span className="md:hidden">Workflow</span>
@@ -107,6 +108,10 @@ export default function Dashboard() {
               <TabsTrigger value="prediction" className="text-xs md:text-sm px-2 md:px-4 whitespace-nowrap">
                 <span className="hidden md:inline">Stock Prediction</span>
                 <span className="md:hidden">Stock</span>
+              </TabsTrigger>
+              <TabsTrigger value="counterfactual" className="text-xs md:text-sm px-2 md:px-4 whitespace-nowrap">
+                <span className="hidden md:inline">Counterfactual AI</span>
+                <span className="md:hidden">AI</span>
               </TabsTrigger>
               <TabsTrigger value="intervention" className="text-xs md:text-sm px-2 md:px-4 whitespace-nowrap">
                 <span className="hidden md:inline">Intervention Simulator</span>

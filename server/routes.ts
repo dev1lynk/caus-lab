@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import multer from "multer";
 import { z } from "zod";
 import { insertProjectSchema, insertUploadedDataSchema, type Variable, type CausalLink, type ProjectResults } from "@shared/schema";
+import { SemiconductorTNCMVAE, predefinedScenarios } from "./huggingface-service";
 
 // Configure multer for file uploads
 const upload = multer({
@@ -21,6 +22,15 @@ const upload = multer({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  
+  // Initialize Hugging Face T-NCM-VAE model
+  let tncmModel: SemiconductorTNCMVAE | null = null;
+  try {
+    tncmModel = new SemiconductorTNCMVAE(process.env.HF_TOKEN);
+    console.log("T-NCM-VAE model initialized successfully");
+  } catch (error) {
+    console.warn("T-NCM-VAE model initialization failed:", error);
+  }
   
   // Create a new project
   app.post("/api/projects", async (req, res) => {
@@ -266,6 +276,101 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error getting project data:", error);
       res.status(500).json({ message: "Error retrieving project data" });
+    }
+  });
+
+  // Hugging Face T-NCM-VAE API endpoints
+
+  // Generate counterfactual scenario
+  app.post("/api/counterfactual", async (req, res) => {
+    try {
+      if (!tncmModel) {
+        return res.status(503).json({ 
+          status: "error", 
+          message: "T-NCM-VAE model not available. Please configure HF_TOKEN environment variable." 
+        });
+      }
+
+      const { input_data, intervention_variable, intervention_value, intervention_time, scenario_name } = req.body;
+
+      if (!input_data || !intervention_variable || intervention_value === undefined || intervention_time === undefined) {
+        return res.status(400).json({
+          status: "error",
+          message: "Missing required fields: input_data, intervention_variable, intervention_value, intervention_time"
+        });
+      }
+
+      const result = await tncmModel.generateCounterfactual({
+        input_data,
+        intervention_variable,
+        intervention_value,
+        intervention_time,
+        scenario_name: scenario_name || "Custom Scenario"
+      });
+
+      res.json(result);
+
+    } catch (error) {
+      console.error("Error generating counterfactual:", error);
+      res.status(500).json({
+        status: "error",
+        message: error instanceof Error ? error.message : "Unknown error occurred"
+      });
+    }
+  });
+
+  // Get model information and predefined scenarios
+  app.get("/api/model-info", async (req, res) => {
+    try {
+      if (!tncmModel) {
+        return res.status(503).json({ 
+          message: "T-NCM-VAE model not available" 
+        });
+      }
+
+      const modelInfo = tncmModel.getModelInfo();
+      res.json(modelInfo);
+
+    } catch (error) {
+      console.error("Error getting model info:", error);
+      res.status(500).json({ message: "Error retrieving model information" });
+    }
+  });
+
+  // Get predefined scenarios
+  app.get("/api/predefined-scenarios", async (req, res) => {
+    try {
+      res.json({
+        scenarios: predefinedScenarios
+      });
+    } catch (error) {
+      console.error("Error getting predefined scenarios:", error);
+      res.status(500).json({ message: "Error retrieving scenarios" });
+    }
+  });
+
+  // Generate sample data for testing
+  app.get("/api/sample-data", async (req, res) => {
+    try {
+      if (!tncmModel) {
+        return res.status(503).json({ 
+          message: "T-NCM-VAE model not available" 
+        });
+      }
+
+      const sampleData = tncmModel.generateSampleData();
+      const modelInfo = tncmModel.getModelInfo();
+      
+      res.json({
+        data: sampleData,
+        variable_names: modelInfo.variables,
+        shape: [20, 15],
+        description: "20 time steps × 15 semiconductor variables"
+      });
+
+    } catch (error) {
+      console.error("Error generating sample data:", error);
+      res.status(500).json({ message: "Error generating sample data" });
     }
   });
 
