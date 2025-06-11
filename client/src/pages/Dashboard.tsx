@@ -167,6 +167,10 @@ export default function Dashboard() {
             <StockPredictionDashboard project={project} />
           </TabsContent>
 
+          <TabsContent value="counterfactual" className="space-y-8">
+            <CounterfactualAnalysis />
+          </TabsContent>
+
           <TabsContent value="intervention" className="space-y-8">
             <InterventionSimulator project={project} isPremium={isPremium} />
           </TabsContent>

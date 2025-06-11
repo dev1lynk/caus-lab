@@ -234,18 +234,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
             lower: Array.from({ length: 30 }, (_, i) => 115000 + Math.random() * 15000 + i * 1000)
           }
         },
-        variableImpact: project.variables.reduce((acc, variable) => {
+        variableImpact: project.variables?.reduce((acc, variable) => {
           acc[variable.name] = Math.random() * 80 + 20; // 20-100%
           return acc;
-        }, {} as Record<string, number>),
-        correlations: project.variables.reduce((acc, variable) => {
-          acc[variable.name] = project.variables.reduce((inner, other) => {
+        }, {} as Record<string, number>) || {},
+        correlations: project.variables?.reduce((acc, variable) => {
+          acc[variable.name] = project.variables?.reduce((inner, other) => {
             inner[other.name] = variable.id === other.id ? 1 : (Math.random() * 2 - 1);
             return inner;
-          }, {} as Record<string, number>);
+          }, {} as Record<string, number>) || {};
           return acc;
-        }, {} as Record<string, Record<string, number>>),
-        summary: `Based on your data analysis and causal model, the key insights show strong correlations between your variables. The model predicts continued growth with ${project.variables.length} variables analyzed over ${project.dataRows} data points.`,
+        }, {} as Record<string, Record<string, number>>) || {},
+        summary: `Based on your data analysis and causal model, the key insights show strong correlations between your variables. The model predicts continued growth with ${project.variables?.length || 0} variables analyzed over ${project.dataRows} data points.`,
         metrics: {
           revenueForcast: "+$127K",
           modelAccuracy: 87.3,

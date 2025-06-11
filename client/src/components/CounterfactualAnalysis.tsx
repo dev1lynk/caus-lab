@@ -111,12 +111,13 @@ export default function CounterfactualAnalysis() {
         ...scenarioData
       };
 
-      const result = await apiRequest('/api/counterfactual', {
+      const response = await fetch('/api/counterfactual', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(requestData)
       });
 
+      const result = await response.json();
       setCounterfactualResult(result);
       
       if (result.status === 'error') {
