@@ -182,7 +182,7 @@ export default function STStockPredictionDashboard() {
           <CardTitle className="flex items-center justify-between">
             <div className="flex items-center">
               <Target className="h-5 w-5 mr-2 text-primary" />
-              ST (Sensata Technologies) Stock Prediction
+              STM (STMicroelectronics) Stock Prediction
             </div>
             <Badge variant="default" className="bg-blue-500">Real-time Data</Badge>
           </CardTitle>

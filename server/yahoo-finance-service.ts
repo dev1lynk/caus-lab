@@ -217,7 +217,7 @@ export class YahooFinanceService {
     const changeDirection = currentPrice.changePercent >= 0 ? 'up' : 'down';
     const volatilityLevel = volatility > 30 ? 'high' : volatility > 15 ? 'moderate' : 'low';
     
-    return `ST stock is ${changeDirection} ${Math.abs(currentPrice.changePercent).toFixed(2)}% over the ${period} period. ` +
+    return `STM stock is ${changeDirection} ${Math.abs(currentPrice.changePercent).toFixed(2)}% over the ${period} period. ` +
            `Current trend is ${trend} with ${volatilityLevel} volatility (${volatility.toFixed(1)}%). ` +
            `Trading volume is ${(currentPrice.volume / 1000000).toFixed(1)}M shares.`;
   }
