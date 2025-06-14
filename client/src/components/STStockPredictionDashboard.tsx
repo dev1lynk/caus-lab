@@ -154,9 +154,12 @@ export default function STStockPredictionDashboard() {
         lowerBound: null
       }));
 
-    // Actual prices from June 10th onwards for comparison
-    const actualFromJune10 = predictionData.historicalData
-      .filter(item => new Date(item.date) >= new Date('2025-06-10'))
+    // Get actual prices from June 10-14 for comparison
+    const actualJune10to14 = predictionData.historicalData
+      .filter(item => {
+        const date = new Date(item.date);
+        return date >= new Date('2025-06-10') && date <= new Date('2025-06-14');
+      })
       .map(item => ({
         date: item.date,
         actualPrice: item.close,
@@ -165,9 +168,12 @@ export default function STStockPredictionDashboard() {
         lowerBound: null
       }));
 
-    // Predictions starting from June 10th
-    const predictionPoints = predictionData.predictions
-      .filter(item => new Date(item.date) >= new Date('2025-06-10'))
+    // Get predictions for June 10-14 to match actual data
+    const predictionsJune10to14 = predictionData.predictions
+      .filter(item => {
+        const date = new Date(item.date);
+        return date >= new Date('2025-06-10') && date <= new Date('2025-06-14');
+      })
       .map(item => ({
         date: item.date,
         actualPrice: null,
@@ -176,17 +182,28 @@ export default function STStockPredictionDashboard() {
         lowerBound: item.confidence.lower
       }));
 
-    // Merge actual and predicted data for June 10th onwards
-    const mergedFromJune10 = [];
+    // Get all future predictions (after June 14) without actual prices
+    const futurePredictions = predictionData.predictions
+      .filter(item => new Date(item.date) > new Date('2025-06-14'))
+      .map(item => ({
+        date: item.date,
+        actualPrice: null,
+        predictedPrice: item.price,
+        upperBound: item.confidence.upper,
+        lowerBound: item.confidence.lower
+      }));
+
+    // Merge comparison period data (June 10-14) to show both lines
+    const comparisonPeriod: any[] = [];
     const dateMap = new Map();
 
-    // Add actual prices
-    actualFromJune10.forEach(point => {
+    // Add actual prices for June 10-14
+    actualJune10to14.forEach(point => {
       dateMap.set(point.date, { ...point });
     });
 
-    // Add predicted prices to the same dates
-    predictionPoints.forEach(point => {
+    // Merge predictions for the same dates
+    predictionsJune10to14.forEach(point => {
       if (dateMap.has(point.date)) {
         dateMap.set(point.date, { 
           ...dateMap.get(point.date), 
@@ -199,13 +216,13 @@ export default function STStockPredictionDashboard() {
       }
     });
 
-    // Convert map back to array and sort by date
-    dateMap.forEach((value, key) => {
-      mergedFromJune10.push(value);
+    // Convert to array and sort
+    dateMap.forEach((value) => {
+      comparisonPeriod.push(value);
     });
-    mergedFromJune10.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    comparisonPeriod.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
-    return [...historicalPoints, ...mergedFromJune10];
+    return [...historicalPoints, ...comparisonPeriod, ...futurePredictions];
   };
 
   const calculateAccuracy = () => {
@@ -487,7 +504,21 @@ export default function STStockPredictionDashboard() {
             <CardContent>
               <div className="mb-4 p-3 bg-muted/50 rounded-lg">
                 <div className="text-sm text-muted-foreground">
-                  <strong>Chart Legend:</strong> Historical data (up to Jun 9) | Predictions start Jun 10 | Orange line shows actual prices for accuracy comparison
+                  <strong>Chart Overview:</strong> Historical data (up to Jun 9) | <strong>Both actual & predicted lines visible Jun 10-14</strong> | Future predictions (Jun 15+)
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-2 text-xs">
+                  <div className="flex items-center">
+                    <div className="w-3 h-0.5 bg-orange-500 mr-2"></div>
+                    <span>Actual Price (Orange)</span>
+                  </div>
+                  <div className="flex items-center">
+                    <div className="w-3 h-0.5 bg-blue-600 mr-2"></div>
+                    <span>T-NCM-VAE Prediction (Blue)</span>
+                  </div>
+                  <div className="flex items-center">
+                    <div className="w-3 h-0.5 bg-gray-400 border-dashed border-t mr-2"></div>
+                    <span>Confidence Bounds</span>
+                  </div>
                 </div>
               </div>
               
@@ -526,14 +557,7 @@ export default function STStockPredictionDashboard() {
                       strokeWidth={3}
                       name="Actual Price"
                       connectNulls={false}
-                      dot={(props) => {
-                        const { cx, cy, payload } = props;
-                        if (!payload?.date) return null;
-                        const isJune10Plus = new Date(payload.date) >= new Date('2025-06-10');
-                        return isJune10Plus ? (
-                          <circle cx={cx} cy={cy} r={4} fill="#ff7300" stroke="#fff" strokeWidth={2} />
-                        ) : null;
-                      }}
+                      dot={{ r: 3 }}
                     />
                     
                     <Line 
@@ -543,11 +567,7 @@ export default function STStockPredictionDashboard() {
                       strokeWidth={3}
                       name="T-NCM-VAE Prediction"
                       connectNulls={false}
-                      dot={(props) => {
-                        const { cx, cy, payload } = props;
-                        if (!payload?.date || !payload?.predictedPrice) return null;
-                        return <circle cx={cx} cy={cy} r={4} fill="#2563eb" stroke="#fff" strokeWidth={2} />;
-                      }}
+                      dot={{ r: 3 }}
                     />
                     
                     <Line 
