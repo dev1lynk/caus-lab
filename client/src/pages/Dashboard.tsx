@@ -12,6 +12,8 @@ import DocumentationSection from "@/components/DocumentationSection";
 
 import STStockPredictionDashboard from "@/components/STStockPredictionDashboard";
 import CounterfactualAnalysis from "@/components/CounterfactualAnalysis";
+import StockPriceHeader from "@/components/StockPriceHeader";
+import VariableImpactAnalysis from "@/components/VariableImpactAnalysis";
 import Footer from "@/components/Footer";
 import { useProject } from "@/hooks/useProject";
 import { Card, CardContent } from "@/components/ui/card";
@@ -75,32 +77,35 @@ export default function Dashboard() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header Section */}
         <div className="mb-8 animate-fade-in">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
             <div>
               <h1 className="text-3xl font-bold text-foreground mb-2">
-                Causal AI Simulation Platform
+                ST Stock Prediction Platform
               </h1>
               <p className="text-muted-foreground">
-                Semiconductor industry causal modeling with advanced intervention simulation and analytics.
+                Advanced Sensata Technologies stock forecasting with AI-powered insights and real-time data.
               </p>
             </div>
-            <div className="flex items-center space-x-3">
-              <Badge variant={isPremium ? "default" : "secondary"}>
-                {isPremium ? "Premium Plan" : "Free Plan"}
-              </Badge>
-              <button
-                onClick={() => setIsPremium(!isPremium)}
-                className="text-xs px-3 py-1 bg-primary/10 text-primary rounded hover:bg-primary/20 transition-colors"
-              >
-                {isPremium ? "Switch to Free" : "Upgrade to Premium"}
-              </button>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-3 sm:space-y-0 sm:space-x-4">
+              <StockPriceHeader />
+              <div className="flex items-center space-x-3">
+                <Badge variant={isPremium ? "default" : "secondary"}>
+                  {isPremium ? "Premium Plan" : "Free Plan"}
+                </Badge>
+                <button
+                  onClick={() => setIsPremium(!isPremium)}
+                  className="text-xs px-3 py-1 bg-primary/10 text-primary rounded hover:bg-primary/20 transition-colors"
+                >
+                  {isPremium ? "Switch to Free" : "Upgrade to Premium"}
+                </button>
+              </div>
             </div>
           </div>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="overflow-x-auto">
-            <TabsList className="flex w-max min-w-full justify-start md:grid md:grid-cols-5 gap-1">
+            <TabsList className="flex w-max min-w-full justify-start md:grid md:grid-cols-6 gap-1">
               <TabsTrigger value="demo" className="text-xs md:text-sm px-2 md:px-4 whitespace-nowrap">
                 <span className="hidden md:inline">Demo</span>
                 <span className="md:hidden">Demo</span>
@@ -108,6 +113,10 @@ export default function Dashboard() {
               <TabsTrigger value="prediction" className="text-xs md:text-sm px-2 md:px-4 whitespace-nowrap">
                 <span className="hidden md:inline">ST Stock Prediction</span>
                 <span className="md:hidden">Predict</span>
+              </TabsTrigger>
+              <TabsTrigger value="variables" className="text-xs md:text-sm px-2 md:px-4 whitespace-nowrap">
+                <span className="hidden md:inline">Variable Impact</span>
+                <span className="md:hidden">Variables</span>
               </TabsTrigger>
               <TabsTrigger value="counterfactual" className="text-xs md:text-sm px-2 md:px-4 whitespace-nowrap">
                 <span className="hidden md:inline">Counterfactual AI</span>
