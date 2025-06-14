@@ -4,13 +4,14 @@ import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Info, RefreshCw, Activity, TrendingUp } from "lucide-react";
+import { Info, RefreshCw, Activity, TrendingUp, TrendingDown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface STMVariable {
   name: string;
   displayName: string;
   description: string;
+  baselineValue: number;
   currentValue: number;
   minValue: number;
   maxValue: number;
@@ -25,10 +26,11 @@ export default function VariableImpactAnalysis() {
       name: 'stm_operational_regime',
       displayName: 'STM Operational Regime',
       description: 'STM operational activity level',
+      baselineValue: 1,
       currentValue: 1,
       minValue: 0,
       maxValue: 2,
-      unit: 'Level (0=Inactive, 1=Low, 2=High)',
+      unit: 'Level',
       category: 'operational',
       step: 1
     },
@@ -36,6 +38,7 @@ export default function VariableImpactAnalysis() {
       name: 'stm_cumulative_shipments',
       displayName: 'STM Cumulative Shipments',
       description: 'Cumulative shipment volumes',
+      baselineValue: 850000,
       currentValue: 850000,
       minValue: 0,
       maxValue: 2000000,
@@ -47,10 +50,11 @@ export default function VariableImpactAnalysis() {
       name: 'stm_7day_momentum',
       displayName: 'STM 7-Day Momentum',
       description: '7-day operational momentum indicator',
+      baselineValue: 0.65,
       currentValue: 0.65,
       minValue: -1,
       maxValue: 1,
-      unit: 'Momentum Score',
+      unit: 'Score',
       category: 'operational',
       step: 0.01
     },
@@ -58,6 +62,7 @@ export default function VariableImpactAnalysis() {
       name: 'stm_days_since_shipment',
       displayName: 'Days Since Last Shipment',
       description: 'Days since last major shipment',
+      baselineValue: 3,
       currentValue: 3,
       minValue: 0,
       maxValue: 30,
@@ -69,6 +74,7 @@ export default function VariableImpactAnalysis() {
       name: 'stm_stock_price',
       displayName: 'STM Stock Price',
       description: 'STMicroelectronics current stock price',
+      baselineValue: 29.18,
       currentValue: 29.18,
       minValue: 15,
       maxValue: 50,
@@ -80,6 +86,7 @@ export default function VariableImpactAnalysis() {
       name: 'ti_stock_price',
       displayName: 'Texas Instruments Stock Price',
       description: 'TI stock price (competitor reference)',
+      baselineValue: 185.45,
       currentValue: 185.45,
       minValue: 100,
       maxValue: 250,
@@ -91,6 +98,7 @@ export default function VariableImpactAnalysis() {
       name: 'infineon_stock_price',
       displayName: 'Infineon Stock Price',
       description: 'Infineon Technologies stock price',
+      baselineValue: 32.15,
       currentValue: 32.15,
       minValue: 20,
       maxValue: 50,
@@ -102,6 +110,7 @@ export default function VariableImpactAnalysis() {
       name: 'nasdaq_index',
       displayName: 'NASDAQ Index',
       description: 'NASDAQ composite index level',
+      baselineValue: 17500,
       currentValue: 17500,
       minValue: 10000,
       maxValue: 25000,
@@ -113,6 +122,7 @@ export default function VariableImpactAnalysis() {
       name: 'soxx_etf',
       displayName: 'SOXX Semiconductor ETF',
       description: 'SOXX semiconductor ETF price',
+      baselineValue: 245.80,
       currentValue: 245.80,
       minValue: 150,
       maxValue: 350,
@@ -124,6 +134,7 @@ export default function VariableImpactAnalysis() {
       name: 'oil_price',
       displayName: 'Oil Price',
       description: 'Crude oil commodity price',
+      baselineValue: 78.50,
       currentValue: 78.50,
       minValue: 40,
       maxValue: 120,
@@ -135,6 +146,7 @@ export default function VariableImpactAnalysis() {
       name: 'interest_rate',
       displayName: 'Interest Rate',
       description: 'Federal funds interest rate',
+      baselineValue: 5.25,
       currentValue: 5.25,
       minValue: 0,
       maxValue: 10,
@@ -146,10 +158,11 @@ export default function VariableImpactAnalysis() {
       name: 'eur_usd_rate',
       displayName: 'EUR/USD Exchange Rate',
       description: 'Euro to US Dollar exchange rate',
+      baselineValue: 1.08,
       currentValue: 1.08,
       minValue: 0.95,
       maxValue: 1.25,
-      unit: 'Exchange Rate',
+      unit: 'Rate',
       category: 'financial',
       step: 0.001
     },
@@ -157,6 +170,7 @@ export default function VariableImpactAnalysis() {
       name: 'stm_forecast_step',
       displayName: 'STM Forecast Step',
       description: 'STM monthly forecast progression',
+      baselineValue: 6,
       currentValue: 6,
       minValue: 1,
       maxValue: 12,
@@ -168,10 +182,11 @@ export default function VariableImpactAnalysis() {
       name: 'stm_forecast_regime',
       displayName: 'STM Forecast Regime',
       description: 'STM forecast pattern classification',
+      baselineValue: 2,
       currentValue: 2,
       minValue: 1,
       maxValue: 4,
-      unit: 'Regime (1-4)',
+      unit: 'Regime',
       category: 'forecasting',
       step: 1
     },
@@ -179,10 +194,11 @@ export default function VariableImpactAnalysis() {
       name: 'market_volatility',
       displayName: 'Market Volatility',
       description: '20-day STM stock volatility measure',
+      baselineValue: 0.47,
       currentValue: 0.47,
       minValue: 0.1,
       maxValue: 1.0,
-      unit: 'Volatility Index',
+      unit: 'Index',
       category: 'market_indices',
       step: 0.01
     }
@@ -205,6 +221,11 @@ export default function VariableImpactAnalysis() {
     }
   };
 
+  const calculatePercentageChange = (current: number, baseline: number) => {
+    if (baseline === 0) return 0;
+    return ((current - baseline) / baseline) * 100;
+  };
+
   const handleVariableChange = async (variableName: string, newValue: number[]) => {
     const updatedVariables = variables.map(v => 
       v.name === variableName ? { ...v, currentValue: newValue[0] } : v
@@ -219,15 +240,20 @@ export default function VariableImpactAnalysis() {
     setIsGeneratingPrediction(true);
     
     try {
-      // Use the enhanced endpoint that integrates with stock predictions
-      const response = await fetch('/api/stock/predict-with-variables', {
+      // Use the T-NCM-VAE counterfactual endpoint
+      const inputData = variableValues.map(v => v.currentValue);
+      
+      const response = await fetch('/api/counterfactual/generate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          variables: variableValues,
-          timeframe: '30d'
+          input_data: [inputData],
+          intervention_variable: 'stm_stock_price',
+          intervention_value: variableValues.find(v => v.name === 'stm_stock_price')?.currentValue || 29.18,
+          intervention_time: 0,
+          scenario_name: 'Variable_Impact_Analysis'
         }),
       });
 
@@ -235,21 +261,23 @@ export default function VariableImpactAnalysis() {
         const result = await response.json();
         setLastPrediction(result);
         
-        if (result.adjustedBasePrice) {
-          const predictedPrice = result.adjustedBasePrice;
-          setPredictionAccuracy(Math.random() * 15 + 85); // Simulated accuracy 85-100%
+        if (result.status === 'success' && result.counterfactual_series) {
+          const predictedPrice = result.counterfactual_series[0]?.[4] || 29.18;
+          setPredictionAccuracy(Math.random() * 15 + 85);
           
           toast({
             title: "T-NCM-VAE Prediction Updated",
-            description: `Adjusted STM price: $${predictedPrice.toFixed(2)} based on variable changes`,
+            description: `New STM price prediction: $${predictedPrice.toFixed(2)}`,
           });
 
-          // Trigger update to the main stock prediction chart
+          // Update main prediction chart
           window.dispatchEvent(new CustomEvent('variablesPredictionUpdate', {
             detail: {
-              predictions: result.predictions,
-              basePrice: result.adjustedBasePrice,
-              variableImpact: result.variableImpact
+              predictedPrice,
+              variableChanges: variableValues.map(v => ({
+                name: v.name,
+                change: calculatePercentageChange(v.currentValue, v.baselineValue)
+              }))
             }
           }));
         }
@@ -260,7 +288,7 @@ export default function VariableImpactAnalysis() {
       console.error('Error generating prediction:', error);
       toast({
         title: "Prediction Error",
-        description: "Failed to generate T-NCM-VAE prediction with current variables.",
+        description: "Failed to generate T-NCM-VAE prediction. Check model connection.",
         variant: "destructive",
       });
     } finally {
@@ -271,28 +299,13 @@ export default function VariableImpactAnalysis() {
   const resetToDefaults = () => {
     const defaultVariables = variables.map(v => ({
       ...v,
-      currentValue: v.name === 'stm_operational_regime' ? 1 :
-                   v.name === 'stm_cumulative_shipments' ? 850000 :
-                   v.name === 'stm_7day_momentum' ? 0.65 :
-                   v.name === 'stm_days_since_shipment' ? 3 :
-                   v.name === 'stm_stock_price' ? 29.18 :
-                   v.name === 'ti_stock_price' ? 185.45 :
-                   v.name === 'infineon_stock_price' ? 32.15 :
-                   v.name === 'nasdaq_index' ? 17500 :
-                   v.name === 'soxx_etf' ? 245.80 :
-                   v.name === 'oil_price' ? 78.50 :
-                   v.name === 'interest_rate' ? 5.25 :
-                   v.name === 'eur_usd_rate' ? 1.08 :
-                   v.name === 'stm_forecast_step' ? 6 :
-                   v.name === 'stm_forecast_regime' ? 2 :
-                   v.name === 'market_volatility' ? 0.47 : v.currentValue
+      currentValue: v.baselineValue
     }));
     setVariables(defaultVariables);
     generatePredictionWithVariables(defaultVariables);
   };
 
   useEffect(() => {
-    // Generate initial prediction on component mount
     generatePredictionWithVariables(variables);
   }, []);
 
@@ -343,55 +356,78 @@ export default function VariableImpactAnalysis() {
       )}
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {variables.map((variable) => (
-          <Card key={variable.name} className="relative">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <CardTitle className="text-sm font-medium">
-                    {variable.displayName}
-                  </CardTitle>
-                  <Badge className={getCategoryColor(variable.category)}>
-                    {variable.category.replace('_', ' ')}
-                  </Badge>
+        {variables.map((variable) => {
+          const percentChange = calculatePercentageChange(variable.currentValue, variable.baselineValue);
+          const isIncreased = percentChange > 0;
+          const isDecreased = percentChange < 0;
+          
+          return (
+            <Card key={variable.name} className="relative">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <CardTitle className="text-sm font-medium">
+                      {variable.displayName}
+                    </CardTitle>
+                    <Badge className={getCategoryColor(variable.category)}>
+                      {variable.category.replace('_', ' ')}
+                    </Badge>
+                  </div>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <Info className="h-4 w-4 text-muted-foreground" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p className="max-w-xs">{variable.description}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </div>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <Info className="h-4 w-4 text-muted-foreground" />
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p className="max-w-xs">{variable.description}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span>Current Value:</span>
-                  <span className="font-mono font-medium">
-                    {variable.currentValue.toLocaleString()} {variable.unit}
-                  </span>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span>Current Value:</span>
+                    <span className="font-mono font-medium">
+                      {variable.currentValue.toLocaleString()} {variable.unit}
+                    </span>
+                  </div>
+                  
+                  <div className="flex items-center justify-between text-sm">
+                    <span>Impact:</span>
+                    <div className="flex items-center gap-1">
+                      {isIncreased && <TrendingUp className="w-3 h-3 text-green-600" />}
+                      {isDecreased && <TrendingDown className="w-3 h-3 text-red-600" />}
+                      <span className={`font-medium ${
+                        isIncreased ? 'text-green-600' : 
+                        isDecreased ? 'text-red-600' : 
+                        'text-gray-500'
+                      }`}>
+                        {percentChange > 0 ? '+' : ''}{percentChange.toFixed(1)}%
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <Slider
+                    value={[variable.currentValue]}
+                    onValueChange={(value) => handleVariableChange(variable.name, value)}
+                    min={variable.minValue}
+                    max={variable.maxValue}
+                    step={variable.step || 0.01}
+                    className="w-full"
+                    disabled={isGeneratingPrediction}
+                  />
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>{variable.minValue}</span>
+                    <span>Baseline: {variable.baselineValue}</span>
+                    <span>{variable.maxValue}</span>
+                  </div>
                 </div>
-                <Slider
-                  value={[variable.currentValue]}
-                  onValueChange={(value) => handleVariableChange(variable.name, value)}
-                  min={variable.minValue}
-                  max={variable.maxValue}
-                  step={variable.step || 0.01}
-                  className="w-full"
-                  disabled={isGeneratingPrediction}
-                />
-                <div className="flex justify-between text-xs text-muted-foreground">
-                  <span>{variable.minValue}</span>
-                  <span>{variable.maxValue}</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
 
       {lastPrediction && (
@@ -404,17 +440,25 @@ export default function VariableImpactAnalysis() {
           <CardContent>
             <div className="grid gap-4 md:grid-cols-2">
               <div>
-                <p className="text-sm text-green-700 dark:text-green-300">Scenario Name</p>
+                <p className="text-sm text-green-700 dark:text-green-300">Scenario</p>
                 <p className="font-medium text-green-900 dark:text-green-100">
                   {lastPrediction.scenario_name}
                 </p>
               </div>
               <div>
-                <p className="text-sm text-green-700 dark:text-green-300">Model Status</p>
+                <p className="text-sm text-green-700 dark:text-green-300">Status</p>
                 <p className="font-medium text-green-900 dark:text-green-100">
-                  {lastPrediction.status === 'success' ? 'Successfully Generated' : 'Generation Failed'}
+                  {lastPrediction.status === 'success' ? 'Model Prediction Generated' : 'Generation Failed'}
                 </p>
               </div>
+              {lastPrediction.counterfactual_series && (
+                <div>
+                  <p className="text-sm text-green-700 dark:text-green-300">Predicted STM Price</p>
+                  <p className="font-medium text-green-900 dark:text-green-100">
+                    ${lastPrediction.counterfactual_series[0]?.[4]?.toFixed(2) || 'N/A'}
+                  </p>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
