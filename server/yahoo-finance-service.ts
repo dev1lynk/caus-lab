@@ -99,7 +99,7 @@ export class YahooFinanceService {
         low: quotes.low[index] || 0,
         close: quotes.close[index] || 0,
         volume: quotes.volume[index] || 0
-      })).filter(item => item.close > 0);
+      })).filter((item: any) => item.close > 0);
     } catch (error) {
       console.error(`Error fetching historical data for ${symbol}:`, error);
       throw new Error(`Failed to fetch historical data for ${symbol}`);

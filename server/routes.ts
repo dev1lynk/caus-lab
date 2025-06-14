@@ -465,7 +465,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             `RSI: ${insights.technicalIndicators.rsi?.toFixed(1) || 'N/A'}`
           ],
           marketSentiment: insights.marketSentiment,
-          recommendation: this.generateRecommendation(insights)
+          recommendation: generateRecommendation(insights)
         }
       };
 
@@ -475,9 +475,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to generate stock prediction" });
     }
   });
-
-  const httpServer = createServer(app);
-  return httpServer;
 
   function generateRecommendation(insights: any): string {
     if (insights.trend === 'bullish' && insights.technicalIndicators.rsi < 70) {
@@ -491,4 +488,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
     return 'Hold - mixed signals, monitor closely';
   }
+
+  const httpServer = createServer(app);
+  return httpServer;
 }

@@ -9,8 +9,8 @@ import ModelTraining from "@/components/ModelTraining";
 import ScenarioSimulation from "@/components/ScenarioSimulation";
 import ResultsDashboard from "@/components/ResultsDashboard";
 import DocumentationSection from "@/components/DocumentationSection";
-import InterventionSimulator from "@/components/InterventionSimulator";
-import StockPredictionDashboard from "@/components/StockPredictionDashboard";
+
+import STStockPredictionDashboard from "@/components/STStockPredictionDashboard";
 import CounterfactualAnalysis from "@/components/CounterfactualAnalysis";
 import Footer from "@/components/Footer";
 import { useProject } from "@/hooks/useProject";
@@ -160,7 +160,7 @@ export default function Dashboard() {
           </TabsContent>
 
           <TabsContent value="prediction" className="space-y-8">
-            <StockPredictionDashboard project={project} />
+            <STStockPredictionDashboard />
           </TabsContent>
 
           <TabsContent value="counterfactual" className="space-y-8">
