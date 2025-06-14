@@ -377,10 +377,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Yahoo Finance API endpoints for ST stock data
 
-  // Get current ST stock price
+  // Get current STM stock price
   app.get("/api/stock/current", async (req, res) => {
     try {
-      const stockData = await yahooFinanceService.getCurrentPrice('ST');
+      const stockData = await yahooFinanceService.getCurrentPrice('STM');
       res.json(stockData);
     } catch (error) {
       console.error("Error fetching current stock price:", error);
@@ -388,11 +388,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get historical ST stock data
+  // Get historical STM stock data
   app.get("/api/stock/historical/:period", async (req, res) => {
     try {
       const period = req.params.period;
-      const historicalData = await yahooFinanceService.getHistoricalData('ST', period);
+      const historicalData = await yahooFinanceService.getHistoricalData('STM', period);
       res.json(historicalData);
     } catch (error) {
       console.error("Error fetching historical stock data:", error);
@@ -404,7 +404,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/stock/insights/:period", async (req, res) => {
     try {
       const period = req.params.period;
-      const insights = await yahooFinanceService.getMarketInsights('ST', period);
+      const insights = await yahooFinanceService.getMarketInsights('STM', period);
       res.json(insights);
     } catch (error) {
       console.error("Error generating market insights:", error);
@@ -419,9 +419,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Get current market data for context
       const [currentPrice, historicalData, insights] = await Promise.all([
-        yahooFinanceService.getCurrentPrice('ST'),
-        yahooFinanceService.getHistoricalData('ST', timeframe || '30d'),
-        yahooFinanceService.getMarketInsights('ST', timeframe || '30d')
+        yahooFinanceService.getCurrentPrice('STM'),
+        yahooFinanceService.getHistoricalData('STM', timeframe || '30d'),
+        yahooFinanceService.getMarketInsights('STM', timeframe || '30d')
       ]);
 
       // Generate prediction based on timeframe

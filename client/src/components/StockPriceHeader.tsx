@@ -39,7 +39,7 @@ export default function StockPriceHeader() {
     <div className="flex items-center space-x-3 text-sm">
       <div className="flex items-center space-x-1">
         <DollarSign className="h-4 w-4 text-primary" />
-        <span className="font-medium">ST</span>
+        <span className="font-medium">STM</span>
       </div>
       
       <div className="flex items-center space-x-2">

@@ -80,11 +80,8 @@ export default function Dashboard() {
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
             <div>
               <h1 className="text-3xl font-bold text-foreground mb-2">
-                ST Stock Prediction Platform
+                STM Stock Prediction Platform
               </h1>
-              <p className="text-muted-foreground">
-                Advanced Sensata Technologies stock forecasting with AI-powered insights and real-time data.
-              </p>
             </div>
             <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-3 sm:space-y-0 sm:space-x-4">
               <StockPriceHeader />
@@ -111,7 +108,7 @@ export default function Dashboard() {
                 <span className="md:hidden">Demo</span>
               </TabsTrigger>
               <TabsTrigger value="prediction" className="text-xs md:text-sm px-2 md:px-4 whitespace-nowrap">
-                <span className="hidden md:inline">ST Stock Prediction</span>
+                <span className="hidden md:inline">STM Stock Prediction</span>
                 <span className="md:hidden">Predict</span>
               </TabsTrigger>
               <TabsTrigger value="variables" className="text-xs md:text-sm px-2 md:px-4 whitespace-nowrap">
