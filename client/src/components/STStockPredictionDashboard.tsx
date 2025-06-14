@@ -182,8 +182,7 @@ export default function STStockPredictionDashboard() {
         lowerBound: item.confidence.lower
       }));
 
-    console.log('Predictions June 10-14:', predictionsJune10to14);
-    console.log('Actual June 10-14:', actualJune10to14);
+
 
     // Get all future predictions (after June 14) without actual prices
     const futurePredictions = predictionData.predictions
