@@ -172,6 +172,10 @@ export default function Dashboard() {
             <STStockPredictionDashboard />
           </TabsContent>
 
+          <TabsContent value="variables" className="space-y-8">
+            <VariableImpactAnalysis />
+          </TabsContent>
+
           <TabsContent value="counterfactual" className="space-y-8">
             <CounterfactualAnalysis />
           </TabsContent>
