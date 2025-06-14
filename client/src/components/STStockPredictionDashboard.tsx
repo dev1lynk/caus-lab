@@ -143,23 +143,104 @@ export default function STStockPredictionDashboard() {
   const formatChartData = () => {
     if (!predictionData) return [];
 
-    const historicalPoints = predictionData.historicalData.map(item => ({
-      date: item.date,
-      actualPrice: item.close,
-      predictedPrice: null,
-      upperBound: null,
-      lowerBound: null
-    }));
+    // Historical data up to June 9th (T-NCM-VAE model limit)
+    const historicalPoints = predictionData.historicalData
+      .filter(item => new Date(item.date) <= new Date('2025-06-09'))
+      .map(item => ({
+        date: item.date,
+        actualPrice: item.close,
+        predictedPrice: null,
+        upperBound: null,
+        lowerBound: null
+      }));
 
-    const predictionPoints = predictionData.predictions.map(item => ({
-      date: item.date,
-      actualPrice: null,
-      predictedPrice: item.price,
-      upperBound: item.confidence.upper,
-      lowerBound: item.confidence.lower
-    }));
+    // Actual prices from June 10th onwards for comparison
+    const actualFromJune10 = predictionData.historicalData
+      .filter(item => new Date(item.date) >= new Date('2025-06-10'))
+      .map(item => ({
+        date: item.date,
+        actualPrice: item.close,
+        predictedPrice: null,
+        upperBound: null,
+        lowerBound: null
+      }));
 
-    return [...historicalPoints, ...predictionPoints];
+    // Predictions starting from June 10th
+    const predictionPoints = predictionData.predictions
+      .filter(item => new Date(item.date) >= new Date('2025-06-10'))
+      .map(item => ({
+        date: item.date,
+        actualPrice: null,
+        predictedPrice: item.price,
+        upperBound: item.confidence.upper,
+        lowerBound: item.confidence.lower
+      }));
+
+    // Merge actual and predicted data for June 10th onwards
+    const mergedFromJune10 = [];
+    const dateMap = new Map();
+
+    // Add actual prices
+    actualFromJune10.forEach(point => {
+      dateMap.set(point.date, { ...point });
+    });
+
+    // Add predicted prices to the same dates
+    predictionPoints.forEach(point => {
+      if (dateMap.has(point.date)) {
+        dateMap.set(point.date, { 
+          ...dateMap.get(point.date), 
+          predictedPrice: point.predictedPrice,
+          upperBound: point.upperBound,
+          lowerBound: point.lowerBound
+        });
+      } else {
+        dateMap.set(point.date, point);
+      }
+    });
+
+    // Convert map back to array and sort by date
+    dateMap.forEach((value, key) => {
+      mergedFromJune10.push(value);
+    });
+    mergedFromJune10.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+    return [...historicalPoints, ...mergedFromJune10];
+  };
+
+  const calculateAccuracy = () => {
+    if (!predictionData) return null;
+
+    const actualPrices = predictionData.historicalData
+      .filter(item => new Date(item.date) >= new Date('2025-06-10') && new Date(item.date) <= new Date('2025-06-14'))
+      .map(item => ({ date: item.date, price: item.close }));
+
+    const predictedPrices = predictionData.predictions
+      .filter(item => new Date(item.date) >= new Date('2025-06-10') && new Date(item.date) <= new Date('2025-06-14'))
+      .map(item => ({ date: item.date, price: item.price }));
+
+    if (actualPrices.length === 0 || predictedPrices.length === 0) return null;
+
+    let totalError = 0;
+    let comparisonCount = 0;
+
+    actualPrices.forEach(actual => {
+      const predicted = predictedPrices.find(pred => pred.date === actual.date);
+      if (predicted) {
+        const error = Math.abs(actual.price - predicted.price) / actual.price;
+        totalError += error;
+        comparisonCount++;
+      }
+    });
+
+    if (comparisonCount === 0) return null;
+
+    const accuracy = (1 - (totalError / comparisonCount)) * 100;
+    return {
+      accuracy: Math.max(0, accuracy),
+      comparisonPeriod: `${actualPrices[0]?.date} to ${actualPrices[actualPrices.length - 1]?.date}`,
+      dataPoints: comparisonCount
+    };
   };
 
   const getPriceChangeIcon = (change: number) => {
@@ -381,14 +462,35 @@ export default function STStockPredictionDashboard() {
             </CardContent>
           </Card>
 
-          {/* Price Chart */}
+          {/* Price Chart with Accuracy */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">
-                Price Prediction Chart ({selectedTimeframe})
+              <CardTitle className="flex items-center justify-between">
+                <span className="text-lg">
+                  Price Prediction Chart ({selectedTimeframe})
+                </span>
+                {(() => {
+                  const accuracy = calculateAccuracy();
+                  return accuracy && (
+                    <div className="flex items-center space-x-2">
+                      <Badge variant="outline" className="text-xs">
+                        Accuracy: {accuracy.accuracy.toFixed(1)}%
+                      </Badge>
+                      <Badge variant="secondary" className="text-xs">
+                        {accuracy.dataPoints} days compared
+                      </Badge>
+                    </div>
+                  );
+                })()}
               </CardTitle>
             </CardHeader>
             <CardContent>
+              <div className="mb-4 p-3 bg-muted/50 rounded-lg">
+                <div className="text-sm text-muted-foreground">
+                  <strong>Chart Legend:</strong> Historical data (up to Jun 9) | Predictions start Jun 10 | Orange line shows actual prices for accuracy comparison
+                </div>
+              </div>
+              
               <div className="h-96">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={formatChartData()}>
@@ -396,7 +498,10 @@ export default function STStockPredictionDashboard() {
                     <XAxis 
                       dataKey="date" 
                       tick={{ fontSize: 12 }}
-                      tickFormatter={(value) => new Date(value).toLocaleDateString()}
+                      tickFormatter={(value) => {
+                        const date = new Date(value);
+                        return `${date.getMonth() + 1}/${date.getDate()}`;
+                      }}
                     />
                     <YAxis 
                       tick={{ fontSize: 12 }}
@@ -407,7 +512,10 @@ export default function STStockPredictionDashboard() {
                         value ? `$${Number(value).toFixed(2)}` : 'N/A', 
                         name
                       ]}
-                      labelFormatter={(label) => new Date(label).toLocaleDateString()}
+                      labelFormatter={(label) => {
+                        const date = new Date(label);
+                        return `${date.toLocaleDateString()} ${date >= new Date('2025-06-10') ? '(Prediction Period)' : '(Historical)'}`;
+                      }}
                     />
                     <Legend />
                     
@@ -415,20 +523,31 @@ export default function STStockPredictionDashboard() {
                       type="monotone" 
                       dataKey="actualPrice" 
                       stroke="#ff7300" 
-                      strokeWidth={2}
-                      name="Actual Price (Historical)"
+                      strokeWidth={3}
+                      name="Actual Price"
                       connectNulls={false}
-                      dot={false}
+                      dot={(props) => {
+                        const { cx, cy, payload } = props;
+                        if (!payload?.date) return null;
+                        const isJune10Plus = new Date(payload.date) >= new Date('2025-06-10');
+                        return isJune10Plus ? (
+                          <circle cx={cx} cy={cy} r={4} fill="#ff7300" stroke="#fff" strokeWidth={2} />
+                        ) : null;
+                      }}
                     />
                     
                     <Line 
                       type="monotone" 
                       dataKey="predictedPrice" 
                       stroke="#2563eb" 
-                      strokeWidth={2}
-                      name="Predicted Price"
+                      strokeWidth={3}
+                      name="T-NCM-VAE Prediction"
                       connectNulls={false}
-                      dot={false}
+                      dot={(props) => {
+                        const { cx, cy, payload } = props;
+                        if (!payload?.date || !payload?.predictedPrice) return null;
+                        return <circle cx={cx} cy={cy} r={4} fill="#2563eb" stroke="#fff" strokeWidth={2} />;
+                      }}
                     />
                     
                     <Line 
@@ -437,7 +556,7 @@ export default function STStockPredictionDashboard() {
                       stroke="#94a3b8" 
                       strokeWidth={1}
                       strokeDasharray="5 5"
-                      name="Upper Confidence"
+                      name="Upper Confidence (95%)"
                       connectNulls={false}
                       dot={false}
                     />
@@ -448,13 +567,44 @@ export default function STStockPredictionDashboard() {
                       stroke="#94a3b8" 
                       strokeWidth={1}
                       strokeDasharray="5 5"
-                      name="Lower Confidence"
+                      name="Lower Confidence (95%)"
                       connectNulls={false}
                       dot={false}
                     />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
+
+              {(() => {
+                const accuracy = calculateAccuracy();
+                return accuracy && (
+                  <div className="mt-4 p-4 bg-green-50 dark:bg-green-950/20 rounded-lg border border-green-200 dark:border-green-800">
+                    <h4 className="font-semibold text-green-900 dark:text-green-100 mb-2">
+                      Prediction Accuracy Analysis
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                      <div>
+                        <span className="text-green-700 dark:text-green-300 font-medium">Overall Accuracy:</span>
+                        <div className="text-lg font-bold text-green-900 dark:text-green-100">
+                          {accuracy.accuracy.toFixed(1)}%
+                        </div>
+                      </div>
+                      <div>
+                        <span className="text-green-700 dark:text-green-300 font-medium">Comparison Period:</span>
+                        <div className="font-medium text-green-900 dark:text-green-100">
+                          Jun 10-14, 2025
+                        </div>
+                      </div>
+                      <div>
+                        <span className="text-green-700 dark:text-green-300 font-medium">Data Points:</span>
+                        <div className="font-medium text-green-900 dark:text-green-100">
+                          {accuracy.dataPoints} trading days
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
             </CardContent>
           </Card>
 
