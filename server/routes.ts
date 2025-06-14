@@ -496,6 +496,82 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Enhanced stock prediction with variable adjustments
+  app.post('/api/stock/predict-with-variables', async (req: Request, res: Response) => {
+    try {
+      const { variables, timeframe } = req.body;
+      
+      // Get current market data
+      const [currentPrice, insights] = await Promise.all([
+        yahooFinanceService.getCurrentPrice('STM'),
+        yahooFinanceService.getMarketInsights('STM', timeframe || '30d')
+      ]);
+      
+      // Prepare variable data for T-NCM-VAE model
+      const inputData = variables.map((v: any) => v.currentValue);
+      
+      // Generate counterfactual prediction using semiconductor model
+      const counterfactualResult = await semiconductorModel.generateCounterfactual({
+        input_data: [inputData],
+        intervention_variable: 'stm_stock_price',
+        intervention_value: variables.find((v: any) => v.name === 'stm_stock_price')?.currentValue || currentPrice.price,
+        intervention_time: 0,
+        scenario_name: 'Variable_Adjustment_Prediction'
+      });
+      
+      // Generate enhanced predictions incorporating variable changes
+      const daysMap = { '1d': 1, '7d': 7, '30d': 30, '90d': 90, '6m': 180 };
+      const days = daysMap[timeframe as keyof typeof daysMap] || 30;
+      
+      const predictions = [];
+      const basePrice = counterfactualResult.counterfactual_series?.[0]?.[4] || currentPrice.price;
+      
+      // Generate predictions from June 10th with variable-adjusted baseline
+      for (let i = 0; i < days; i++) {
+        const predictionDate = new Date('2025-06-10');
+        predictionDate.setDate(predictionDate.getDate() + i);
+        
+        const variableInfluence = inputData.reduce((acc: number, value: number, index: number) => {
+          // Weight different variables differently based on their importance
+          const weights = [0.15, 0.12, 0.10, 0.08, 0.20, 0.08, 0.07, 0.06, 0.05, 0.04, 0.03, 0.02, 0.02, 0.03, 0.05];
+          return acc + (value * weights[index]);
+        }, 0);
+        
+        const timeDecay = Math.exp(-i * 0.01);
+        const price = basePrice * (1 + (variableInfluence - 0.5) * timeDecay * 0.1);
+        
+        predictions.push({
+          date: predictionDate.toISOString().split('T')[0],
+          price: Math.max(price, basePrice * 0.7),
+          confidence: {
+            upper: price * 1.15,
+            lower: price * 0.85
+          }
+        });
+      }
+      
+      res.json({
+        timeframe,
+        currentPrice: currentPrice.price,
+        adjustedBasePrice: basePrice,
+        predictions,
+        counterfactualResult,
+        variableImpact: inputData.map((value: number, index: number) => ({
+          index,
+          value,
+          impact: (value - 0.5) * 100
+        }))
+      });
+      
+    } catch (error) {
+      console.error('Variable-based prediction error:', error);
+      res.status(500).json({
+        status: 'error',
+        message: 'Failed to generate variable-based prediction'
+      });
+    }
+  });
+
   function generateRecommendation(insights: any): string {
     if (insights.trend === 'bullish' && insights.technicalIndicators.rsi < 70) {
       return 'Consider buying - positive momentum with room for growth';
