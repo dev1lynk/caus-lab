@@ -74,9 +74,20 @@ export default function STStockPredictionDashboard() {
 
   useEffect(() => {
     loadCurrentPrice();
-    const interval = setInterval(loadCurrentPrice, 60000); // Update every minute
-    return () => clearInterval(interval);
-  }, []);
+    const priceInterval = setInterval(loadCurrentPrice, 60000); // Update every minute
+    
+    // Auto-generate predictions on initial load and refresh
+    if (selectedTimeframe) {
+      generatePrediction();
+      const predictionInterval = setInterval(generatePrediction, 300000); // Update predictions every 5 minutes
+      return () => {
+        clearInterval(priceInterval);
+        clearInterval(predictionInterval);
+      };
+    }
+    
+    return () => clearInterval(priceInterval);
+  }, [selectedTimeframe]);
 
   const loadCurrentPrice = async () => {
     try {
@@ -184,55 +195,53 @@ export default function STStockPredictionDashboard() {
 
 
 
-    // Get all future predictions (after June 14) without actual prices
-    const futurePredictions = predictionData.predictions
-      .filter(item => new Date(item.date) > new Date('2025-06-14'))
-      .map(item => ({
-        date: item.date,
-        actualPrice: null,
-        predictedPrice: item.price,
-        upperBound: item.confidence.upper,
-        lowerBound: item.confidence.lower
-      }));
-
-    // Create comprehensive data array with both actual and predicted values
-    const allDates = new Set([
-      ...actualJune10to14.map(item => item.date),
-      ...predictionsJune10to14.map(item => item.date),
-      ...futurePredictions.map(item => item.date)
-    ]);
-
-    const comparisonPeriod: any[] = [];
+    // Create a comprehensive date-based mapping for all prediction data
+    const dataMap = new Map();
+    const currentDate = new Date();
     
-    // Process June 10-14 period with both actual and predicted data
-    actualJune10to14.forEach(actualPoint => {
-      const matchingPrediction = predictionsJune10to14.find(p => p.date === actualPoint.date);
-      comparisonPeriod.push({
-        date: actualPoint.date,
-        actualPrice: actualPoint.actualPrice,
-        predictedPrice: matchingPrediction ? matchingPrediction.predictedPrice : null,
-        upperBound: matchingPrediction ? matchingPrediction.upperBound : null,
-        lowerBound: matchingPrediction ? matchingPrediction.lowerBound : null
+    // Add all actual historical data from June 10 onwards
+    predictionData.historicalData
+      .filter(item => new Date(item.date) >= new Date('2025-06-10'))
+      .forEach(item => {
+        dataMap.set(item.date, {
+          date: item.date,
+          actualPrice: item.close,
+          predictedPrice: null,
+          upperBound: null,
+          lowerBound: null
+        });
       });
-    });
 
-    // Add any prediction dates not covered by actual data in June 10-14
-    predictionsJune10to14.forEach(predPoint => {
-      const exists = comparisonPeriod.find(cp => cp.date === predPoint.date);
-      if (!exists) {
-        comparisonPeriod.push({
-          date: predPoint.date,
+    // Overlay all predictions on the same dates and add future predictions
+    predictionData.predictions.forEach(prediction => {
+      const predDate = prediction.date;
+      const existing = dataMap.get(predDate);
+      
+      if (existing) {
+        // Merge with existing actual data
+        dataMap.set(predDate, {
+          ...existing,
+          predictedPrice: prediction.price,
+          upperBound: prediction.confidence.upper,
+          lowerBound: prediction.confidence.lower
+        });
+      } else {
+        // Add pure prediction data for dates without actual data
+        dataMap.set(predDate, {
+          date: predDate,
           actualPrice: null,
-          predictedPrice: predPoint.predictedPrice,
-          upperBound: predPoint.upperBound,
-          lowerBound: predPoint.lowerBound
+          predictedPrice: prediction.price,
+          upperBound: prediction.confidence.upper,
+          lowerBound: prediction.confidence.lower
         });
       }
     });
 
-    comparisonPeriod.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    // Convert map to array and sort by date
+    const dynamicData = Array.from(dataMap.values())
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
-    return [...historicalPoints, ...comparisonPeriod, ...futurePredictions];
+    return [...historicalPoints, ...dynamicData];
   };
 
   const calculateAccuracy = () => {

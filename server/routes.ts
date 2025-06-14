@@ -436,48 +436,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const june10 = new Date('2025-06-10');
       const today = new Date();
       
-      // Always include June 10-14 predictions first, then extend based on timeframe
-      const basePredictionDates = [
-        '2025-06-10', '2025-06-11', '2025-06-12', '2025-06-13', '2025-06-14'
-      ];
+      // Generate dynamic predictions starting from June 10th up to current date + future
+      const startDate = new Date('2025-06-10');
+      const currentDate = new Date();
+      const endDate = new Date(currentDate);
+      endDate.setDate(currentDate.getDate() + days);
       
-      // Generate predictions for June 10-14 (comparison period)
-      basePredictionDates.forEach((dateStr, index) => {
-        const randomWalk = (Math.random() - 0.5) * baseVolatility * 0.05;
-        const trendFactor = insights.trend === 'bullish' ? 0.002 : insights.trend === 'bearish' ? -0.002 : 0;
-        const basePrice = 29.5;
-        const price = basePrice * (1 + (randomWalk + trendFactor) * (index * 0.1 + 1));
+      // Calculate total days to generate (from June 10 to end date)
+      const totalDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+      
+      for (let i = 0; i < totalDays; i++) {
+        const predictionDate = new Date(startDate);
+        predictionDate.setDate(startDate.getDate() + i);
+        
+        // Skip if prediction date is in the past before June 10
+        if (predictionDate < startDate) continue;
+        
+        const daysSinceStart = i;
+        const randomWalk = (Math.random() - 0.5) * baseVolatility * 0.03;
+        const trendFactor = insights.trend === 'bullish' ? 0.001 : insights.trend === 'bearish' ? -0.001 : 0;
+        
+        // Use current price as baseline for more accurate predictions
+        const basePrice = currentPriceValue;
+        const timeDecay = Math.exp(-daysSinceStart * 0.01); // Gradual decay in prediction accuracy
+        const price = basePrice * (1 + (randomWalk + trendFactor) * timeDecay * (daysSinceStart * 0.05 + 1));
         
         predictions.push({
-          date: dateStr,
-          price: Math.max(price, basePrice * 0.8),
+          date: predictionDate.toISOString().split('T')[0],
+          price: Math.max(price, basePrice * 0.7), // Prevent unrealistic drops
           confidence: {
-            upper: price * (1 + baseVolatility * 0.12),
-            lower: price * (1 - baseVolatility * 0.12)
+            upper: price * (1 + baseVolatility * 0.1 * (1 + daysSinceStart * 0.01)),
+            lower: price * (1 - baseVolatility * 0.1 * (1 + daysSinceStart * 0.01))
           }
         });
-      });
-
-      // Add future predictions based on timeframe
-      if (days > 5) {
-        for (let i = 5; i < days; i++) {
-          const predictionDate = new Date('2025-06-10');
-          predictionDate.setDate(predictionDate.getDate() + i);
-          
-          const randomWalk = (Math.random() - 0.5) * baseVolatility * 0.05;
-          const trendFactor = insights.trend === 'bullish' ? 0.002 : insights.trend === 'bearish' ? -0.002 : 0;
-          const basePrice = 29.5;
-          const price = basePrice * (1 + (randomWalk + trendFactor) * (i * 0.1 + 1));
-          
-          predictions.push({
-            date: predictionDate.toISOString().split('T')[0],
-            price: Math.max(price, basePrice * 0.7),
-            confidence: {
-              upper: price * (1 + baseVolatility * 0.12),
-              lower: price * (1 - baseVolatility * 0.12)
-            }
-          });
-        }
       }
 
       const response = {
