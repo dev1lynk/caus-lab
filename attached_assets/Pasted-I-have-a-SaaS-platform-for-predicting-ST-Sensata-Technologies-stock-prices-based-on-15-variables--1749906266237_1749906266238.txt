@@ -1,0 +1,96 @@
+I have a SaaS platform for predicting ST (Sensata Technologies) stock prices based on 15 variables. I need the platform enhanced with UI updates, real-time data integration, executive summaries, and mobile responsiveness.
+
+🔧 REQUIRED UPDATES
+🔄 Frontend Modifications:
+Rename Navigation Tab
+
+Change "Dashboard" tab to "Demo" in both navigation and routing logic.
+
+Remove Tab/Feature
+
+Completely remove the "Intervention Simulator" tab.
+
+Delete its associated frontend components and backend logic (if any).
+
+Prediction UI Enhancement
+
+In the "Generate Prediction" section, add a new dropdown or toggle to select timeframes:
+
+1 day, 7 days, 30 days, 90 days, and 6 months.
+
+📈 Real-Time Stock Price & Visualization
+Yahoo Finance API Integration
+
+Use the public Yahoo Finance API (e.g., via yfinance in Python) to:
+
+Fetch real-time ST stock price (ticker: ST).
+
+Display the current price in the navbar or card component on the homepage/demo screen.
+
+Chart Enhancement
+
+In the price chart (predicted prices), add a new orange line:
+
+This line represents the actual stock price from 9 June to today, pulled from Yahoo Finance.
+
+Use a distinct legend label like "Actual Price".
+
+📊 Executive Summary & Market Insights
+Generate Market Summary for Each Timeframe
+For each prediction interval selected (1d, 7d, 30d, 90d, 6m), generate and display a brief executive summary and market insight using Yahoo Finance API.
+
+The summary should include:
+
+Recent price trend (e.g., % change in price).
+
+Relevant news headlines (if available from API).
+
+Technical indicators (e.g., 50-day MA vs 200-day MA, RSI, volatility).
+
+Volume insights or analyst rating trends (if available).
+
+Display these insights next to or below the prediction result.
+
+📌 Variable Impact Tab
+Ensure Full Variable Display
+
+In the "Variable Impact" tab, show all 15 model input variables regardless of impact score.
+
+Provide a tooltip or small chart to display even low-impact variables clearly.
+
+📱 Mobile Optimization
+Make Platform Mobile Friendly
+
+Use CSS media queries, or adopt Tailwind CSS or Bootstrap 5.
+
+Ensure:
+
+Navigation is collapsible on mobile.
+
+Charts resize fluidly.
+
+Text and buttons are touch-friendly and well-spaced.
+
+Executive summary is readable and expandable on small screens.
+
+🧱 Technology Stack Suggestions
+If applicable:
+
+Frontend: React.js with Tailwind CSS or Bootstrap.
+
+Charting: Chart.js, Plotly, or Highcharts for dynamic price overlays.
+
+Backend: Python (Flask or FastAPI) or Node.js.
+
+Yahoo Finance Integration:
+
+Python: yfinance, requests, or pandas_datareader.
+
+Node.js: yahoo-finance2 or axios for scraping public endpoints.
+
+Optional Enhancements:
+
+Use caching (e.g., Redis) to reduce API calls.
+
+Allow date range selection for comparisons.
+

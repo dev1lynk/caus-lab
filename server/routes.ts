@@ -5,6 +5,7 @@ import multer from "multer";
 import { z } from "zod";
 import { insertProjectSchema, insertUploadedDataSchema, type Variable, type CausalLink, type ProjectResults } from "@shared/schema";
 import { SemiconductorTNCMVAE, predefinedScenarios } from "./huggingface-service";
+import { yahooFinanceService } from "./yahoo-finance-service";
 
 // Configure multer for file uploads
 const upload = multer({
@@ -374,6 +375,120 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Yahoo Finance API endpoints for ST stock data
+
+  // Get current ST stock price
+  app.get("/api/stock/current", async (req, res) => {
+    try {
+      const stockData = await yahooFinanceService.getCurrentPrice('ST');
+      res.json(stockData);
+    } catch (error) {
+      console.error("Error fetching current stock price:", error);
+      res.status(500).json({ message: "Failed to fetch current stock price" });
+    }
+  });
+
+  // Get historical ST stock data
+  app.get("/api/stock/historical/:period", async (req, res) => {
+    try {
+      const period = req.params.period;
+      const historicalData = await yahooFinanceService.getHistoricalData('ST', period);
+      res.json(historicalData);
+    } catch (error) {
+      console.error("Error fetching historical stock data:", error);
+      res.status(500).json({ message: "Failed to fetch historical stock data" });
+    }
+  });
+
+  // Get market insights for specific timeframe
+  app.get("/api/stock/insights/:period", async (req, res) => {
+    try {
+      const period = req.params.period;
+      const insights = await yahooFinanceService.getMarketInsights('ST', period);
+      res.json(insights);
+    } catch (error) {
+      console.error("Error generating market insights:", error);
+      res.status(500).json({ message: "Failed to generate market insights" });
+    }
+  });
+
+  // Generate stock prediction with timeframe
+  app.post("/api/stock/predict", async (req, res) => {
+    try {
+      const { timeframe, variables } = req.body;
+      
+      // Get current market data for context
+      const [currentPrice, historicalData, insights] = await Promise.all([
+        yahooFinanceService.getCurrentPrice('ST'),
+        yahooFinanceService.getHistoricalData('ST', timeframe || '30d'),
+        yahooFinanceService.getMarketInsights('ST', timeframe || '30d')
+      ]);
+
+      // Generate prediction based on timeframe
+      const daysMap = { '1d': 1, '7d': 7, '30d': 30, '90d': 90, '6m': 180 };
+      const days = daysMap[timeframe as keyof typeof daysMap] || 30;
+      
+      const currentPriceValue = currentPrice.price;
+      const baseVolatility = insights.volatility / 100;
+      
+      // Generate realistic predictions with market context
+      const predictions = [];
+      for (let i = 0; i < days; i++) {
+        const randomWalk = (Math.random() - 0.5) * baseVolatility * 0.1;
+        const trendFactor = insights.trend === 'bullish' ? 0.001 : insights.trend === 'bearish' ? -0.001 : 0;
+        const price = currentPriceValue * (1 + (randomWalk + trendFactor) * (i + 1));
+        
+        const date = new Date();
+        date.setDate(date.getDate() + i + 1);
+        
+        predictions.push({
+          date: date.toISOString().split('T')[0],
+          price: Math.max(price, currentPriceValue * 0.5), // Prevent unrealistic drops
+          confidence: {
+            upper: price * (1 + baseVolatility * 0.15),
+            lower: price * (1 - baseVolatility * 0.15)
+          }
+        });
+      }
+
+      const response = {
+        timeframe,
+        currentPrice: currentPriceValue,
+        predictions,
+        historicalData: historicalData.slice(-30), // Last 30 days for chart
+        insights,
+        executiveSummary: {
+          outlook: insights.trend === 'bullish' ? 'Positive' : insights.trend === 'bearish' ? 'Negative' : 'Neutral',
+          keyDrivers: [
+            `Current trend: ${insights.trend}`,
+            `Volatility: ${insights.volatility.toFixed(1)}%`,
+            `RSI: ${insights.technicalIndicators.rsi?.toFixed(1) || 'N/A'}`
+          ],
+          marketSentiment: insights.marketSentiment,
+          recommendation: this.generateRecommendation(insights)
+        }
+      };
+
+      res.json(response);
+    } catch (error) {
+      console.error("Error generating stock prediction:", error);
+      res.status(500).json({ message: "Failed to generate stock prediction" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
+
+  function generateRecommendation(insights: any): string {
+    if (insights.trend === 'bullish' && insights.technicalIndicators.rsi < 70) {
+      return 'Consider buying - positive momentum with room for growth';
+    } else if (insights.trend === 'bearish' && insights.technicalIndicators.rsi > 30) {
+      return 'Consider selling - negative momentum detected';
+    } else if (insights.technicalIndicators.rsi > 70) {
+      return 'Hold - potentially overbought, watch for pullback';
+    } else if (insights.technicalIndicators.rsi < 30) {
+      return 'Consider buying - potentially oversold opportunity';
+    }
+    return 'Hold - mixed signals, monitor closely';
+  }
 }

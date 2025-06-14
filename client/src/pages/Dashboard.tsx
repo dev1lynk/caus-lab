@@ -100,22 +100,18 @@ export default function Dashboard() {
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="overflow-x-auto">
-            <TabsList className="flex w-max min-w-full justify-start md:grid md:grid-cols-6 gap-1">
-              <TabsTrigger value="workflow" className="text-xs md:text-sm px-2 md:px-4 whitespace-nowrap">
-                <span className="hidden md:inline">Project Workflow</span>
-                <span className="md:hidden">Workflow</span>
+            <TabsList className="flex w-max min-w-full justify-start md:grid md:grid-cols-5 gap-1">
+              <TabsTrigger value="demo" className="text-xs md:text-sm px-2 md:px-4 whitespace-nowrap">
+                <span className="hidden md:inline">Demo</span>
+                <span className="md:hidden">Demo</span>
               </TabsTrigger>
               <TabsTrigger value="prediction" className="text-xs md:text-sm px-2 md:px-4 whitespace-nowrap">
-                <span className="hidden md:inline">Stock Prediction</span>
-                <span className="md:hidden">Stock</span>
+                <span className="hidden md:inline">ST Stock Prediction</span>
+                <span className="md:hidden">Predict</span>
               </TabsTrigger>
               <TabsTrigger value="counterfactual" className="text-xs md:text-sm px-2 md:px-4 whitespace-nowrap">
                 <span className="hidden md:inline">Counterfactual AI</span>
                 <span className="md:hidden">AI</span>
-              </TabsTrigger>
-              <TabsTrigger value="intervention" className="text-xs md:text-sm px-2 md:px-4 whitespace-nowrap">
-                <span className="hidden md:inline">Intervention Simulator</span>
-                <span className="md:hidden">Simulate</span>
               </TabsTrigger>
               <TabsTrigger value="samples" className="text-xs md:text-sm px-2 md:px-4 whitespace-nowrap">
                 <span className="hidden md:inline">Sample Projects</span>
@@ -128,7 +124,7 @@ export default function Dashboard() {
             </TabsList>
           </div>
 
-          <TabsContent value="workflow" className="space-y-8">
+          <TabsContent value="demo" className="space-y-8">
             {/* Progress Steps */}
             <ProgressSteps currentStep={getCurrentStep(project.status)} />
 
@@ -171,9 +167,7 @@ export default function Dashboard() {
             <CounterfactualAnalysis />
           </TabsContent>
 
-          <TabsContent value="intervention" className="space-y-8">
-            <InterventionSimulator project={project} isPremium={isPremium} />
-          </TabsContent>
+
 
           <TabsContent value="samples" className="space-y-8">
             <DocumentationSection />
