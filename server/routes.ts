@@ -510,8 +510,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Prepare variable data for T-NCM-VAE model
       const inputData = variables.map((v: any) => v.currentValue);
       
-      // Generate counterfactual prediction using semiconductor model
-      const counterfactualResult = await semiconductorModel.generateCounterfactual({
+      // Generate counterfactual prediction using T-NCM-VAE model
+      const counterfactualResult = await tncmModel.generateCounterfactual({
         input_data: [inputData],
         intervention_variable: 'stm_stock_price',
         intervention_value: variables.find((v: any) => v.name === 'stm_stock_price')?.currentValue || currentPrice.price,
