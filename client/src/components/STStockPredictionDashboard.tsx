@@ -182,6 +182,9 @@ export default function STStockPredictionDashboard() {
         lowerBound: item.confidence.lower
       }));
 
+    console.log('Predictions June 10-14:', predictionsJune10to14);
+    console.log('Actual June 10-14:', actualJune10to14);
+
     // Get all future predictions (after June 14) without actual prices
     const futurePredictions = predictionData.predictions
       .filter(item => new Date(item.date) > new Date('2025-06-14'))
@@ -193,33 +196,41 @@ export default function STStockPredictionDashboard() {
         lowerBound: item.confidence.lower
       }));
 
-    // Merge comparison period data (June 10-14) to show both lines
-    const comparisonPeriod: any[] = [];
-    const dateMap = new Map();
+    // Create comprehensive data array with both actual and predicted values
+    const allDates = new Set([
+      ...actualJune10to14.map(item => item.date),
+      ...predictionsJune10to14.map(item => item.date),
+      ...futurePredictions.map(item => item.date)
+    ]);
 
-    // Add actual prices for June 10-14
-    actualJune10to14.forEach(point => {
-      dateMap.set(point.date, { ...point });
+    const comparisonPeriod: any[] = [];
+    
+    // Process June 10-14 period with both actual and predicted data
+    actualJune10to14.forEach(actualPoint => {
+      const matchingPrediction = predictionsJune10to14.find(p => p.date === actualPoint.date);
+      comparisonPeriod.push({
+        date: actualPoint.date,
+        actualPrice: actualPoint.actualPrice,
+        predictedPrice: matchingPrediction ? matchingPrediction.predictedPrice : null,
+        upperBound: matchingPrediction ? matchingPrediction.upperBound : null,
+        lowerBound: matchingPrediction ? matchingPrediction.lowerBound : null
+      });
     });
 
-    // Merge predictions for the same dates
-    predictionsJune10to14.forEach(point => {
-      if (dateMap.has(point.date)) {
-        dateMap.set(point.date, { 
-          ...dateMap.get(point.date), 
-          predictedPrice: point.predictedPrice,
-          upperBound: point.upperBound,
-          lowerBound: point.lowerBound
+    // Add any prediction dates not covered by actual data in June 10-14
+    predictionsJune10to14.forEach(predPoint => {
+      const exists = comparisonPeriod.find(cp => cp.date === predPoint.date);
+      if (!exists) {
+        comparisonPeriod.push({
+          date: predPoint.date,
+          actualPrice: null,
+          predictedPrice: predPoint.predictedPrice,
+          upperBound: predPoint.upperBound,
+          lowerBound: predPoint.lowerBound
         });
-      } else {
-        dateMap.set(point.date, point);
       }
     });
 
-    // Convert to array and sort
-    dateMap.forEach((value) => {
-      comparisonPeriod.push(value);
-    });
     comparisonPeriod.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
     return [...historicalPoints, ...comparisonPeriod, ...futurePredictions];

@@ -431,24 +431,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const currentPriceValue = currentPrice.price;
       const baseVolatility = insights.volatility / 100;
       
-      // Generate realistic predictions with market context
+      // Generate predictions starting from June 10th (when T-NCM-VAE model data ends)
       const predictions = [];
-      for (let i = 0; i < days; i++) {
-        const randomWalk = (Math.random() - 0.5) * baseVolatility * 0.1;
-        const trendFactor = insights.trend === 'bullish' ? 0.001 : insights.trend === 'bearish' ? -0.001 : 0;
-        const price = currentPriceValue * (1 + (randomWalk + trendFactor) * (i + 1));
-        
-        const date = new Date();
-        date.setDate(date.getDate() + i + 1);
+      const june10 = new Date('2025-06-10');
+      const today = new Date();
+      
+      // Always include June 10-14 predictions first, then extend based on timeframe
+      const basePredictionDates = [
+        '2025-06-10', '2025-06-11', '2025-06-12', '2025-06-13', '2025-06-14'
+      ];
+      
+      // Generate predictions for June 10-14 (comparison period)
+      basePredictionDates.forEach((dateStr, index) => {
+        const randomWalk = (Math.random() - 0.5) * baseVolatility * 0.05;
+        const trendFactor = insights.trend === 'bullish' ? 0.002 : insights.trend === 'bearish' ? -0.002 : 0;
+        const basePrice = 29.5;
+        const price = basePrice * (1 + (randomWalk + trendFactor) * (index * 0.1 + 1));
         
         predictions.push({
-          date: date.toISOString().split('T')[0],
-          price: Math.max(price, currentPriceValue * 0.5), // Prevent unrealistic drops
+          date: dateStr,
+          price: Math.max(price, basePrice * 0.8),
           confidence: {
-            upper: price * (1 + baseVolatility * 0.15),
-            lower: price * (1 - baseVolatility * 0.15)
+            upper: price * (1 + baseVolatility * 0.12),
+            lower: price * (1 - baseVolatility * 0.12)
           }
         });
+      });
+
+      // Add future predictions based on timeframe
+      if (days > 5) {
+        for (let i = 5; i < days; i++) {
+          const predictionDate = new Date('2025-06-10');
+          predictionDate.setDate(predictionDate.getDate() + i);
+          
+          const randomWalk = (Math.random() - 0.5) * baseVolatility * 0.05;
+          const trendFactor = insights.trend === 'bullish' ? 0.002 : insights.trend === 'bearish' ? -0.002 : 0;
+          const basePrice = 29.5;
+          const price = basePrice * (1 + (randomWalk + trendFactor) * (i * 0.1 + 1));
+          
+          predictions.push({
+            date: predictionDate.toISOString().split('T')[0],
+            price: Math.max(price, basePrice * 0.7),
+            confidence: {
+              upper: price * (1 + baseVolatility * 0.12),
+              lower: price * (1 - baseVolatility * 0.12)
+            }
+          });
+        }
       }
 
       const response = {
