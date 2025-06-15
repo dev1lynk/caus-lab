@@ -15,6 +15,8 @@ import CounterfactualAnalysis from "@/components/CounterfactualAnalysis";
 import StockPriceHeader from "@/components/StockPriceHeader";
 import VariableImpactAnalysis from "@/components/VariableImpactAnalysis";
 import ProjectWorkflow from "@/components/ProjectWorkflow";
+import SampleProjectsSection from "@/components/SampleProjectsSection";
+import DocumentationContent from "@/components/DocumentationContent";
 import Footer from "@/components/Footer";
 import { useProject } from "@/hooks/useProject";
 import { Card, CardContent } from "@/components/ui/card";
@@ -116,7 +118,7 @@ export default function Dashboard() {
           </div>
 
           <TabsContent value="samples" className="space-y-8">
-            <DocumentationSection />
+            <SampleProjectsSection />
           </TabsContent>
 
           <TabsContent value="documentation" className="space-y-8">
