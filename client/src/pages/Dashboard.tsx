@@ -1,4 +1,4 @@
-import { useParams, useLocation } from "wouter";
+import { useParams } from "wouter";
 import { useEffect, useState } from "react";
 import Navigation from "@/components/Navigation";
 import ProgressSteps from "@/components/ProgressSteps";
@@ -24,14 +24,10 @@ import { Badge } from "@/components/ui/badge";
 
 export default function Dashboard() {
   const params = useParams();
-  const [location] = useLocation();
   const projectId = params.id ? parseInt(params.id) : null;
   const { project, createProject, isLoading } = useProject(projectId);
   const [isPremium, setIsPremium] = useState(false); // Toggle for premium features
-  
-  // Get tab from URL parameters or default to "projects"
-  const urlParams = new URLSearchParams(location.split('?')[1] || '');
-  const [activeTab, setActiveTab] = useState(urlParams.get('tab') || "projects");
+  const [activeTab, setActiveTab] = useState("workflow");
 
   useEffect(() => {
     if (!projectId && !project) {
@@ -107,51 +103,54 @@ export default function Dashboard() {
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="overflow-x-auto">
-            <TabsList className="flex w-max min-w-full justify-start md:grid md:grid-cols-2 gap-1">
-              <TabsTrigger value="projects" className="text-xs md:text-sm px-4 md:px-6 whitespace-nowrap">
-                <span className="hidden md:inline">Projects</span>
-                <span className="md:hidden">Projects</span>
+            <TabsList className="flex w-max min-w-full justify-start md:grid md:grid-cols-6 gap-1">
+              <TabsTrigger value="demo" className="text-xs md:text-sm px-2 md:px-4 whitespace-nowrap">
+                <span className="hidden md:inline">Workflow</span>
+                <span className="md:hidden">Flow</span>
               </TabsTrigger>
-              <TabsTrigger value="documentation" className="text-xs md:text-sm px-4 md:px-6 whitespace-nowrap">
+              <TabsTrigger value="prediction" className="text-xs md:text-sm px-2 md:px-4 whitespace-nowrap">
+                <span className="hidden md:inline">STM Stock Prediction</span>
+                <span className="md:hidden">Predict</span>
+              </TabsTrigger>
+              <TabsTrigger value="variables" className="text-xs md:text-sm px-2 md:px-4 whitespace-nowrap">
+                <span className="hidden md:inline">Variable Impact</span>
+                <span className="md:hidden">Variables</span>
+              </TabsTrigger>
+              <TabsTrigger value="counterfactual" className="text-xs md:text-sm px-2 md:px-4 whitespace-nowrap">
+                <span className="hidden md:inline">Counterfactual AI</span>
+                <span className="md:hidden">AI</span>
+              </TabsTrigger>
+              <TabsTrigger value="samples" className="text-xs md:text-sm px-2 md:px-4 whitespace-nowrap">
+                <span className="hidden md:inline">Sample Projects</span>
+                <span className="md:hidden">Samples</span>
+              </TabsTrigger>
+              <TabsTrigger value="documentation" className="text-xs md:text-sm px-2 md:px-4 whitespace-nowrap">
                 <span className="hidden md:inline">Documentation</span>
                 <span className="md:hidden">Docs</span>
               </TabsTrigger>
             </TabsList>
           </div>
 
-          <TabsContent value="projects" className="space-y-8">
-            {/* Progress Steps */}
-            <ProgressSteps currentStep={getCurrentStep(project.status)} />
+          <TabsContent value="demo" className="space-y-8">
+            <ProjectWorkflow />
+          </TabsContent>
 
-            {/* Main Content Grid */}
-            <div className="space-y-8">
-              {/* Data Upload and Variable Configuration */}
-              {(project.status === 'upload' || project.status === 'diagram') && (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                  <DataUpload project={project} />
-                  {(project.dataRows || 0) > 0 && <VariableConfiguration project={project} isPremium={isPremium} />}
-                </div>
-              )}
+          <TabsContent value="prediction" className="space-y-8">
+            <STStockPredictionDashboard />
+          </TabsContent>
 
-              {/* Causal Diagram Builder */}
-              {(project.status === 'diagram' || project.status === 'training' || project.status === 'complete') && 
-               (project.variables || []).length > 0 && (
-                <CausalDiagramBuilder project={project} />
-              )}
+          <TabsContent value="variables" className="space-y-8">
+            <VariableImpactAnalysis />
+          </TabsContent>
 
-              {/* Model Training and Simulation */}
-              {(project.status === 'training' || project.status === 'complete') && (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                  <ModelTraining project={project} />
-                  <ScenarioSimulation project={project} />
-                </div>
-              )}
+          <TabsContent value="counterfactual" className="space-y-8">
+            <CounterfactualAnalysis />
+          </TabsContent>
 
-              {/* Results Dashboard */}
-              {project.status === 'complete' && project.results && (
-                <ResultsDashboard project={project} />
-              )}
-            </div>
+
+
+          <TabsContent value="samples" className="space-y-8">
+            <DocumentationSection />
           </TabsContent>
 
           <TabsContent value="documentation" className="space-y-8">

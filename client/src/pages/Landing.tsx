@@ -68,18 +68,16 @@ export default function Landing() {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/workflow">
+            <Link href="/dashboard">
               <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 px-8 py-4 text-lg">
                 Start Simulating Now
                 <Zap className="w-5 h-5 ml-2" />
               </Button>
             </Link>
-            <Link href="/stm-demo">
-              <Button size="lg" variant="outline" className="px-8 py-4 text-lg">
-                Watch Demo
-                <BarChart3 className="w-5 h-5 ml-2" />
-              </Button>
-            </Link>
+            <Button size="lg" variant="outline" className="px-8 py-4 text-lg">
+              Watch Demo
+              <BarChart3 className="w-5 h-5 ml-2" />
+            </Button>
           </div>
         </div>
       </section>
@@ -368,17 +366,15 @@ export default function Landing() {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/workflow">
+            <Link href="/dashboard">
               <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 px-12 py-4 text-lg">
                 Get Started Free
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </Link>
-            <Link href="/stm-demo">
-              <Button size="lg" variant="outline" className="px-12 py-4 text-lg">
-                Schedule Demo
-              </Button>
-            </Link>
+            <Button size="lg" variant="outline" className="px-12 py-4 text-lg">
+              Schedule Demo
+            </Button>
           </div>
           
           <div className="mt-12 flex flex-wrap justify-center gap-8 text-sm text-gray-500 dark:text-gray-400">
