@@ -24,10 +24,14 @@ import { Badge } from "@/components/ui/badge";
 
 export default function Dashboard() {
   const params = useParams();
+  const [location] = useLocation();
   const projectId = params.id ? parseInt(params.id) : null;
   const { project, createProject, isLoading } = useProject(projectId);
   const [isPremium, setIsPremium] = useState(false); // Toggle for premium features
-  const [activeTab, setActiveTab] = useState("workflow");
+  
+  // Get tab from URL parameters or default to "projects"
+  const urlParams = new URLSearchParams(location.split('?')[1] || '');
+  const [activeTab, setActiveTab] = useState(urlParams.get('tab') || "projects");
 
   useEffect(() => {
     if (!projectId && !project) {
