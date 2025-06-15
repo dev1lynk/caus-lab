@@ -14,6 +14,7 @@ import STStockPredictionDashboard from "@/components/STStockPredictionDashboard"
 import CounterfactualAnalysis from "@/components/CounterfactualAnalysis";
 import StockPriceHeader from "@/components/StockPriceHeader";
 import VariableImpactAnalysis from "@/components/VariableImpactAnalysis";
+import ProjectWorkflow from "@/components/ProjectWorkflow";
 import Footer from "@/components/Footer";
 import { useProject } from "@/hooks/useProject";
 import { Card, CardContent } from "@/components/ui/card";
@@ -104,8 +105,8 @@ export default function Dashboard() {
           <div className="overflow-x-auto">
             <TabsList className="flex w-max min-w-full justify-start md:grid md:grid-cols-6 gap-1">
               <TabsTrigger value="demo" className="text-xs md:text-sm px-2 md:px-4 whitespace-nowrap">
-                <span className="hidden md:inline">Demo</span>
-                <span className="md:hidden">Demo</span>
+                <span className="hidden md:inline">Workflow</span>
+                <span className="md:hidden">Flow</span>
               </TabsTrigger>
               <TabsTrigger value="prediction" className="text-xs md:text-sm px-2 md:px-4 whitespace-nowrap">
                 <span className="hidden md:inline">STM Stock Prediction</span>
@@ -131,38 +132,7 @@ export default function Dashboard() {
           </div>
 
           <TabsContent value="demo" className="space-y-8">
-            {/* Progress Steps */}
-            <ProgressSteps currentStep={getCurrentStep(project.status)} />
-
-            {/* Main Content Grid */}
-            <div className="space-y-8">
-              {/* Data Upload and Variable Configuration */}
-              {(project.status === 'upload' || project.status === 'diagram') && (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                  <DataUpload project={project} />
-                  {(project.dataRows || 0) > 0 && <VariableConfiguration project={project} isPremium={isPremium} />}
-                </div>
-              )}
-
-              {/* Causal Diagram Builder */}
-              {(project.status === 'diagram' || project.status === 'training' || project.status === 'complete') && 
-               (project.variables || []).length > 0 && (
-                <CausalDiagramBuilder project={project} />
-              )}
-
-              {/* Model Training and Simulation */}
-              {(project.status === 'training' || project.status === 'complete') && (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                  <ModelTraining project={project} />
-                  <ScenarioSimulation project={project} />
-                </div>
-              )}
-
-              {/* Results Dashboard */}
-              {project.status === 'complete' && project.results && (
-                <ResultsDashboard project={project} />
-              )}
-            </div>
+            <ProjectWorkflow />
           </TabsContent>
 
           <TabsContent value="prediction" className="space-y-8">
