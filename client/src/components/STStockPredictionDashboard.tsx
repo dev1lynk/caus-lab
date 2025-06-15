@@ -257,23 +257,24 @@ export default function STStockPredictionDashboard() {
 
     if (actualPrices.length === 0 || predictedPrices.length === 0) return null;
 
-    let totalError = 0;
+    let sumSquaredErrors = 0;
     let comparisonCount = 0;
 
     actualPrices.forEach(actual => {
       const predicted = predictedPrices.find(pred => pred.date === actual.date);
       if (predicted) {
-        const error = Math.abs(actual.price - predicted.price) / actual.price;
-        totalError += error;
+        const error = actual.price - predicted.price;
+        sumSquaredErrors += error * error;
         comparisonCount++;
       }
     });
 
     if (comparisonCount === 0) return null;
 
-    const accuracy = (1 - (totalError / comparisonCount)) * 100;
+    const mse = sumSquaredErrors / comparisonCount;
     return {
-      accuracy: Math.max(0, accuracy),
+      mse: mse,
+      rmse: Math.sqrt(mse),
       comparisonPeriod: `${actualPrices[0]?.date} to ${actualPrices[actualPrices.length - 1]?.date}`,
       dataPoints: comparisonCount
     };
@@ -510,7 +511,10 @@ export default function STStockPredictionDashboard() {
                   return accuracy && (
                     <div className="flex items-center space-x-2">
                       <Badge variant="outline" className="text-xs">
-                        Accuracy: {accuracy.accuracy.toFixed(1)}%
+                        MSE: {accuracy.mse.toFixed(3)}
+                      </Badge>
+                      <Badge variant="outline" className="text-xs">
+                        RMSE: {accuracy.rmse.toFixed(3)}
                       </Badge>
                       <Badge variant="secondary" className="text-xs">
                         {accuracy.dataPoints} days compared
@@ -621,11 +625,17 @@ export default function STStockPredictionDashboard() {
                     <h4 className="font-semibold text-green-900 dark:text-green-100 mb-2">
                       Prediction Accuracy Analysis
                     </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
                       <div>
-                        <span className="text-green-700 dark:text-green-300 font-medium">Overall Accuracy:</span>
+                        <span className="text-green-700 dark:text-green-300 font-medium">MSE:</span>
                         <div className="text-lg font-bold text-green-900 dark:text-green-100">
-                          {accuracy.accuracy.toFixed(1)}%
+                          {accuracy.mse.toFixed(3)}
+                        </div>
+                      </div>
+                      <div>
+                        <span className="text-green-700 dark:text-green-300 font-medium">RMSE:</span>
+                        <div className="text-lg font-bold text-green-900 dark:text-green-100">
+                          {accuracy.rmse.toFixed(3)}
                         </div>
                       </div>
                       <div>
