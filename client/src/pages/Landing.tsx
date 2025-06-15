@@ -68,16 +68,18 @@ export default function Landing() {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/dashboard">
+            <Link href="/workflow">
               <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 px-8 py-4 text-lg">
                 Start Simulating Now
                 <Zap className="w-5 h-5 ml-2" />
               </Button>
             </Link>
-            <Button size="lg" variant="outline" className="px-8 py-4 text-lg">
-              Watch Demo
-              <BarChart3 className="w-5 h-5 ml-2" />
-            </Button>
+            <Link href="/workflow">
+              <Button size="lg" variant="outline" className="px-8 py-4 text-lg">
+                Watch Demo
+                <BarChart3 className="w-5 h-5 ml-2" />
+              </Button>
+            </Link>
           </div>
         </div>
       </section>

@@ -27,7 +27,7 @@ export default function Dashboard() {
   const projectId = params.id ? parseInt(params.id) : null;
   const { project, createProject, isLoading } = useProject(projectId);
   const [isPremium, setIsPremium] = useState(false); // Toggle for premium features
-  const [activeTab, setActiveTab] = useState("workflow");
+  const [activeTab, setActiveTab] = useState("samples");
 
   useEffect(() => {
     if (!projectId && !project) {
@@ -103,26 +103,10 @@ export default function Dashboard() {
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="overflow-x-auto">
-            <TabsList className="flex w-max min-w-full justify-start md:grid md:grid-cols-6 gap-1">
-              <TabsTrigger value="demo" className="text-xs md:text-sm px-2 md:px-4 whitespace-nowrap">
-                <span className="hidden md:inline">Workflow</span>
-                <span className="md:hidden">Flow</span>
-              </TabsTrigger>
-              <TabsTrigger value="prediction" className="text-xs md:text-sm px-2 md:px-4 whitespace-nowrap">
-                <span className="hidden md:inline">STM Stock Prediction</span>
-                <span className="md:hidden">Predict</span>
-              </TabsTrigger>
-              <TabsTrigger value="variables" className="text-xs md:text-sm px-2 md:px-4 whitespace-nowrap">
-                <span className="hidden md:inline">Variable Impact</span>
-                <span className="md:hidden">Variables</span>
-              </TabsTrigger>
-              <TabsTrigger value="counterfactual" className="text-xs md:text-sm px-2 md:px-4 whitespace-nowrap">
-                <span className="hidden md:inline">Counterfactual AI</span>
-                <span className="md:hidden">AI</span>
-              </TabsTrigger>
+            <TabsList className="flex w-max min-w-full justify-start md:grid md:grid-cols-2 gap-1">
               <TabsTrigger value="samples" className="text-xs md:text-sm px-2 md:px-4 whitespace-nowrap">
                 <span className="hidden md:inline">Sample Projects</span>
-                <span className="md:hidden">Samples</span>
+                <span className="md:hidden">Projects</span>
               </TabsTrigger>
               <TabsTrigger value="documentation" className="text-xs md:text-sm px-2 md:px-4 whitespace-nowrap">
                 <span className="hidden md:inline">Documentation</span>
@@ -130,24 +114,6 @@ export default function Dashboard() {
               </TabsTrigger>
             </TabsList>
           </div>
-
-          <TabsContent value="demo" className="space-y-8">
-            <ProjectWorkflow />
-          </TabsContent>
-
-          <TabsContent value="prediction" className="space-y-8">
-            <STStockPredictionDashboard />
-          </TabsContent>
-
-          <TabsContent value="variables" className="space-y-8">
-            <VariableImpactAnalysis />
-          </TabsContent>
-
-          <TabsContent value="counterfactual" className="space-y-8">
-            <CounterfactualAnalysis />
-          </TabsContent>
-
-
 
           <TabsContent value="samples" className="space-y-8">
             <DocumentationSection />

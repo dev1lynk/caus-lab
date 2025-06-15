@@ -228,10 +228,12 @@ export default function ProjectWorkflow() {
                 <div className="text-xs text-gray-500">AI Model</div>
               </div>
             </div>
-            <Button className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700">
-              Try STM Demo
-              <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
+            <Link href="/stm-demo">
+              <Button className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700">
+                Try STM Demo
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </Link>
           </CardContent>
         </Card>
 

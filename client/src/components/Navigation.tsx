@@ -1,18 +1,21 @@
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { ChartGantt, User } from "lucide-react";
+import { Brain, User } from "lucide-react";
+import { Link, useLocation } from "wouter";
 
 export default function Navigation() {
+  const [location] = useLocation();
+  
   return (
     <nav className="bg-card shadow-sm border-b border-border sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
-            <div className="flex-shrink-0 flex items-center">
-              <ChartGantt className="text-primary text-2xl mr-3" />
-              <span className="text-xl font-bold text-foreground">CausalAI</span>
-            </div>
+            <Link href="/" className="flex-shrink-0 flex items-center cursor-pointer">
+              <Brain className="text-primary text-2xl mr-3" />
+              <span className="text-xl font-bold text-foreground">Causal AI</span>
+            </Link>
             <div className="hidden md:block ml-10">
               <div className="flex items-baseline space-x-4">
                 <a 
