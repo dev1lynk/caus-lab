@@ -16,28 +16,22 @@ export default function Navigation() {
               <Brain className="text-primary text-2xl mr-3" />
               <span className="text-xl font-bold text-foreground">Causal AI</span>
             </Link>
-            <div className="hidden md:block ml-10">
-              <div className="flex items-baseline space-x-4">
-                <a 
-                  href="#" 
-                  className="bg-primary/10 text-primary px-3 py-2 rounded-md text-sm font-medium"
-                >
-                  Dashboard
-                </a>
-                <a 
-                  href="#" 
-                  className="text-muted-foreground hover:text-foreground px-3 py-2 rounded-md text-sm font-medium transition-colors"
-                >
-                  Projects
-                </a>
-                <a 
-                  href="#" 
-                  className="text-muted-foreground hover:text-foreground px-3 py-2 rounded-md text-sm font-medium transition-colors"
-                >
-                  Documentation
-                </a>
+            {location !== "/" && (
+              <div className="hidden md:block ml-10">
+                <div className="flex items-baseline space-x-4">
+                  <Link href="/workflow">
+                    <Button variant="ghost" size="sm" className="flex items-center space-x-2">
+                      <span>Workflow</span>
+                    </Button>
+                  </Link>
+                  <Link href="/stm-demo">
+                    <Button variant="ghost" size="sm" className="flex items-center space-x-2">
+                      <span>STM Demo</span>
+                    </Button>
+                  </Link>
+                </div>
               </div>
-            </div>
+            )}
           </div>
           <div className="flex items-center space-x-4">
             <Badge variant="secondary" className="text-xs">
