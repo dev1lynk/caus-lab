@@ -18,6 +18,19 @@ interface StockPrice {
   timestamp: number;
 }
 
+interface TimeframeAnalysis {
+  period: string;
+  priceChange: number;
+  priceChangePercent: number;
+  volatility: number;
+  avgVolume: number;
+  high: number;
+  low: number;
+  trend: 'bullish' | 'bearish' | 'neutral';
+  momentum: string;
+  keyEvents: string[];
+}
+
 interface MarketInsights {
   priceChange: number;
   priceChangePercent: number;
@@ -33,6 +46,21 @@ interface MarketInsights {
   };
   summary: string;
   marketSentiment: string;
+  multiTimeframe?: {
+    '7d': TimeframeAnalysis;
+    '30d': TimeframeAnalysis;
+    '90d': TimeframeAnalysis;
+    '6m': TimeframeAnalysis;
+  };
+  fundamentals?: {
+    peRatio?: number;
+    eps?: number;
+    marketCap?: number;
+    dividend?: number;
+    beta?: number;
+    dayRange: { low: number; high: number };
+    weekRange52: { low: number; high: number };
+  };
 }
 
 interface PredictionResponse {
@@ -663,7 +691,8 @@ export default function STStockPredictionDashboard() {
               <CardTitle className="text-lg">Market Insights & Technical Analysis</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              {/* Current Market Metrics */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                 <Card>
                   <CardContent className="pt-4">
                     <div className="text-center">
@@ -679,6 +708,17 @@ export default function STStockPredictionDashboard() {
                       <p className="text-sm font-medium text-muted-foreground">RSI</p>
                       <p className="text-2xl font-bold">
                         {predictionData.insights.technicalIndicators.rsi?.toFixed(0) || 'N/A'}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardContent className="pt-4">
+                    <div className="text-center">
+                      <p className="text-sm font-medium text-muted-foreground">Beta</p>
+                      <p className="text-2xl font-bold">
+                        {predictionData.insights.fundamentals?.beta?.toFixed(2) || 'N/A'}
                       </p>
                     </div>
                   </CardContent>
@@ -705,11 +745,133 @@ export default function STStockPredictionDashboard() {
                 </Card>
               </div>
 
+              {/* Multi-Timeframe Analysis */}
+              <div className="mb-6">
+                <h4 className="font-semibold mb-4">Multi-Timeframe Performance Analysis</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {predictionData.insights.multiTimeframe && Object.entries(predictionData.insights.multiTimeframe).map(([period, analysis]) => (
+                    <Card key={period} className="border">
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-sm font-medium">{period.toUpperCase()} Analysis</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-2">
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs text-muted-foreground">Change</span>
+                          <span className={`text-sm font-bold ${analysis.priceChangePercent >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                            {analysis.priceChangePercent >= 0 ? '+' : ''}{analysis.priceChangePercent.toFixed(1)}%
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs text-muted-foreground">Volatility</span>
+                          <span className="text-sm">{analysis.volatility.toFixed(1)}%</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs text-muted-foreground">Trend</span>
+                          <Badge variant="outline" className="text-xs">
+                            {analysis.trend}
+                          </Badge>
+                        </div>
+                        <div className="pt-1">
+                          <p className="text-xs text-muted-foreground">{analysis.momentum}</p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+
+              {/* Fundamental Metrics */}
+              <div className="mb-6">
+                <h4 className="font-semibold mb-4">Fundamental Analysis</h4>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="bg-muted/30 p-3 rounded-lg">
+                    <p className="text-sm font-medium text-muted-foreground">P/E Ratio</p>
+                    <p className="text-lg font-bold">{predictionData.insights.fundamentals?.peRatio?.toFixed(1) || 'N/A'}</p>
+                  </div>
+                  <div className="bg-muted/30 p-3 rounded-lg">
+                    <p className="text-sm font-medium text-muted-foreground">EPS</p>
+                    <p className="text-lg font-bold">${predictionData.insights.fundamentals?.eps?.toFixed(2) || 'N/A'}</p>
+                  </div>
+                  <div className="bg-muted/30 p-3 rounded-lg">
+                    <p className="text-sm font-medium text-muted-foreground">Dividend Yield</p>
+                    <p className="text-lg font-bold">{predictionData.insights.fundamentals?.dividend?.toFixed(1) || 'N/A'}%</p>
+                  </div>
+                  <div className="bg-muted/30 p-3 rounded-lg">
+                    <p className="text-sm font-medium text-muted-foreground">52W Range</p>
+                    <p className="text-sm font-bold">
+                      ${predictionData.insights.fundamentals?.weekRange52?.low?.toFixed(2) || 'N/A'} - 
+                      ${predictionData.insights.fundamentals?.weekRange52?.high?.toFixed(2) || 'N/A'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Technical Indicators */}
+              <div className="mb-6">
+                <h4 className="font-semibold mb-4">Technical Indicators</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-muted/30 p-4 rounded-lg">
+                    <h5 className="font-medium mb-2">Moving Averages</h5>
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span className="text-sm">MA50</span>
+                        <span className="text-sm font-medium">${predictionData.insights.technicalIndicators.ma50?.toFixed(2) || 'N/A'}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm">MA200</span>
+                        <span className="text-sm font-medium">${predictionData.insights.technicalIndicators.ma200?.toFixed(2) || 'N/A'}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="bg-muted/30 p-4 rounded-lg">
+                    <h5 className="font-medium mb-2">Support & Resistance</h5>
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span className="text-sm">Support</span>
+                        <span className="text-sm font-medium">${predictionData.insights.technicalIndicators.support?.toFixed(2) || 'N/A'}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm">Resistance</span>
+                        <span className="text-sm font-medium">${predictionData.insights.technicalIndicators.resistance?.toFixed(2) || 'N/A'}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Key Events Timeline */}
+              {predictionData.insights.multiTimeframe && (
+                <div className="mb-6">
+                  <h4 className="font-semibold mb-4">Recent Market Events</h4>
+                  <div className="space-y-3">
+                    {Object.entries(predictionData.insights.multiTimeframe).map(([period, analysis]) => (
+                      <div key={period} className="border-l-4 border-blue-500 pl-4">
+                        <h6 className="font-medium text-sm">{period.toUpperCase()} Period</h6>
+                        <ul className="text-sm text-muted-foreground mt-1 space-y-1">
+                          {analysis.keyEvents.map((event, index) => (
+                            <li key={index} className="flex items-start">
+                              <span className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 mr-2 flex-shrink-0"></span>
+                              {event}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Market Summary */}
               <div className="bg-muted/50 p-4 rounded-lg">
-                <h4 className="font-semibold mb-2">Analysis Summary</h4>
-                <p className="text-sm text-muted-foreground">
+                <h4 className="font-semibold mb-2">Professional Market Analysis</h4>
+                <p className="text-sm text-muted-foreground mb-3">
                   {predictionData.insights.summary}
                 </p>
+                <div className="pt-2 border-t border-muted">
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Market Sentiment: {predictionData.insights.marketSentiment}
+                  </p>
+                </div>
               </div>
             </CardContent>
           </Card>
