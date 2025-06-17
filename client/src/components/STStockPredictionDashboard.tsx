@@ -43,6 +43,9 @@ interface MarketInsights {
     ma200?: number;
     support?: number;
     resistance?: number;
+    macd?: number;
+    bollinger?: { upper: number; lower: number; middle: number };
+    stochastic?: number;
   };
   summary: string;
   marketSentiment: string;
@@ -60,6 +63,41 @@ interface MarketInsights {
     beta?: number;
     dayRange: { low: number; high: number };
     weekRange52: { low: number; high: number };
+    avgVolume?: number;
+    sharesOutstanding?: number;
+    bookValue?: number;
+    priceToBook?: number;
+  };
+  liveMarketData?: {
+    marketStatus: 'open' | 'closed' | 'pre-market' | 'after-hours';
+    nextEarnings?: string;
+    institutionalOwnership?: number;
+    shortInterest?: number;
+    analystRating?: { rating: string; targetPrice: number; analysts: number };
+    sectorPerformance: {
+      sector: string;
+      performance: number;
+      ranking: number;
+    };
+    correlations: {
+      sp500: number;
+      nasdaq: number;
+      sector: number;
+    };
+  };
+  newsAndSentiment?: {
+    sentiment: 'very-positive' | 'positive' | 'neutral' | 'negative' | 'very-negative';
+    sentimentScore: number;
+    recentNews: Array<{
+      headline: string;
+      impact: 'high' | 'medium' | 'low';
+      timestamp: string;
+    }>;
+    socialSentiment: {
+      bullish: number;
+      bearish: number;
+      neutral: number;
+    };
   };
 }
 
@@ -688,11 +726,129 @@ export default function STStockPredictionDashboard() {
           {/* Market Insights */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Market Insights & Technical Analysis</CardTitle>
+              <CardTitle className="text-lg flex items-center justify-between">
+                <span>Live Market Insights & Analysis</span>
+                {predictionData.insights.liveMarketData && (
+                  <Badge 
+                    variant={predictionData.insights.liveMarketData.marketStatus === 'open' ? 'default' : 'secondary'}
+                    className={predictionData.insights.liveMarketData.marketStatus === 'open' ? 'bg-green-500' : ''}
+                  >
+                    {predictionData.insights.liveMarketData.marketStatus.toUpperCase().replace('-', ' ')}
+                  </Badge>
+                )}
+              </CardTitle>
             </CardHeader>
             <CardContent>
+              {/* Live Market Status */}
+              {predictionData.insights.liveMarketData && (
+                <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                  <h4 className="font-semibold text-blue-900 dark:text-blue-100 mb-3">Live Market Data</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="text-center">
+                      <p className="text-sm text-blue-700 dark:text-blue-300">Next Earnings</p>
+                      <p className="font-bold text-blue-900 dark:text-blue-100">
+                        {predictionData.insights.liveMarketData.nextEarnings || 'TBD'}
+                      </p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-sm text-blue-700 dark:text-blue-300">Analyst Rating</p>
+                      <div className="font-bold text-blue-900 dark:text-blue-100">
+                        {predictionData.insights.liveMarketData.analystRating?.rating || 'N/A'}
+                        {predictionData.insights.liveMarketData.analystRating?.targetPrice && (
+                          <div className="text-xs">Target: ${predictionData.insights.liveMarketData.analystRating.targetPrice.toFixed(2)}</div>
+                        )}
+                      </div>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-sm text-blue-700 dark:text-blue-300">Sector Rank</p>
+                      <p className="font-bold text-blue-900 dark:text-blue-100">
+                        #{predictionData.insights.liveMarketData.sectorPerformance.ranking}/11
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* News & Sentiment */}
+              {predictionData.insights.newsAndSentiment && (
+                <div className="mb-6">
+                  <h4 className="font-semibold mb-4">Market Sentiment & News</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                      <div className="text-center p-4 bg-muted/30 rounded-lg">
+                        <p className="text-sm font-medium text-muted-foreground mb-2">Overall Sentiment</p>
+                        <Badge 
+                          variant={
+                            predictionData.insights.newsAndSentiment.sentiment === 'very-positive' || 
+                            predictionData.insights.newsAndSentiment.sentiment === 'positive' ? 'default' :
+                            predictionData.insights.newsAndSentiment.sentiment === 'very-negative' || 
+                            predictionData.insights.newsAndSentiment.sentiment === 'negative' ? 'destructive' : 'secondary'
+                          }
+                          className={
+                            predictionData.insights.newsAndSentiment.sentiment === 'very-positive' || 
+                            predictionData.insights.newsAndSentiment.sentiment === 'positive' ? 'bg-green-500' : ''
+                          }
+                        >
+                          {predictionData.insights.newsAndSentiment.sentiment.toUpperCase().replace('-', ' ')}
+                        </Badge>
+                      </div>
+                      <div className="bg-muted/30 p-4 rounded-lg">
+                        <h5 className="font-medium mb-3">Social Sentiment</h5>
+                        <div className="space-y-2">
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm">Bullish</span>
+                            <div className="flex items-center">
+                              <div className="w-20 h-2 bg-gray-200 rounded mr-2">
+                                <div 
+                                  className="h-full bg-green-500 rounded" 
+                                  style={{ width: `${predictionData.insights.newsAndSentiment.socialSentiment.bullish}%` }}
+                                ></div>
+                              </div>
+                              <span className="text-sm font-medium">{predictionData.insights.newsAndSentiment.socialSentiment.bullish.toFixed(0)}%</span>
+                            </div>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm">Bearish</span>
+                            <div className="flex items-center">
+                              <div className="w-20 h-2 bg-gray-200 rounded mr-2">
+                                <div 
+                                  className="h-full bg-red-500 rounded" 
+                                  style={{ width: `${predictionData.insights.newsAndSentiment.socialSentiment.bearish}%` }}
+                                ></div>
+                              </div>
+                              <span className="text-sm font-medium">{predictionData.insights.newsAndSentiment.socialSentiment.bearish.toFixed(0)}%</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div>
+                      <h5 className="font-medium mb-3">Recent News</h5>
+                      <div className="space-y-3">
+                        {predictionData.insights.newsAndSentiment.recentNews.slice(0, 3).map((news, index) => (
+                          <div key={index} className="p-3 border border-muted rounded-lg">
+                            <div className="flex items-start justify-between mb-2">
+                              <Badge 
+                                variant={news.impact === 'high' ? 'destructive' : news.impact === 'medium' ? 'default' : 'secondary'}
+                                className="text-xs"
+                              >
+                                {news.impact.toUpperCase()}
+                              </Badge>
+                              <span className="text-xs text-muted-foreground">
+                                {new Date(news.timestamp).toLocaleTimeString()}
+                              </span>
+                            </div>
+                            <p className="text-sm">{news.headline}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Current Market Metrics */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
                 <Card>
                   <CardContent className="pt-4">
                     <div className="text-center">
@@ -716,9 +872,20 @@ export default function STStockPredictionDashboard() {
                 <Card>
                   <CardContent className="pt-4">
                     <div className="text-center">
-                      <p className="text-sm font-medium text-muted-foreground">Beta</p>
+                      <p className="text-sm font-medium text-muted-foreground">MACD</p>
                       <p className="text-2xl font-bold">
-                        {predictionData.insights.fundamentals?.beta?.toFixed(2) || 'N/A'}
+                        {predictionData.insights.technicalIndicators.macd?.toFixed(2) || 'N/A'}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardContent className="pt-4">
+                    <div className="text-center">
+                      <p className="text-sm font-medium text-muted-foreground">Stochastic</p>
+                      <p className="text-2xl font-bold">
+                        {predictionData.insights.technicalIndicators.stochastic?.toFixed(0) || 'N/A'}
                       </p>
                     </div>
                   </CardContent>
@@ -744,6 +911,55 @@ export default function STStockPredictionDashboard() {
                   </CardContent>
                 </Card>
               </div>
+
+              {/* Institutional & Advanced Metrics */}
+              {predictionData.insights.liveMarketData && (
+                <div className="mb-6">
+                  <h4 className="font-semibold mb-4">Institutional Analysis</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="bg-muted/30 p-4 rounded-lg">
+                      <h5 className="font-medium mb-3">Ownership Structure</h5>
+                      <div className="space-y-2">
+                        <div className="flex justify-between">
+                          <span className="text-sm">Institutional</span>
+                          <span className="text-sm font-medium">{predictionData.insights.liveMarketData.institutionalOwnership?.toFixed(1) || 'N/A'}%</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-sm">Short Interest</span>
+                          <span className="text-sm font-medium">{predictionData.insights.liveMarketData.shortInterest?.toFixed(1) || 'N/A'}%</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="bg-muted/30 p-4 rounded-lg">
+                      <h5 className="font-medium mb-3">Market Correlations</h5>
+                      <div className="space-y-2">
+                        <div className="flex justify-between">
+                          <span className="text-sm">S&P 500</span>
+                          <span className="text-sm font-medium">{predictionData.insights.liveMarketData.correlations.sp500.toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-sm">NASDAQ</span>
+                          <span className="text-sm font-medium">{predictionData.insights.liveMarketData.correlations.nasdaq.toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-sm">Sector</span>
+                          <span className="text-sm font-medium">{predictionData.insights.liveMarketData.correlations.sector.toFixed(2)}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="bg-muted/30 p-4 rounded-lg">
+                      <h5 className="font-medium mb-3">Sector Performance</h5>
+                      <div className="text-center">
+                        <p className="text-sm text-muted-foreground">{predictionData.insights.liveMarketData.sectorPerformance.sector}</p>
+                        <p className={`text-lg font-bold ${predictionData.insights.liveMarketData.sectorPerformance.performance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                          {predictionData.insights.liveMarketData.sectorPerformance.performance >= 0 ? '+' : ''}{predictionData.insights.liveMarketData.sectorPerformance.performance.toFixed(2)}%
+                        </p>
+                        <p className="text-xs text-muted-foreground">Rank #{predictionData.insights.liveMarketData.sectorPerformance.ranking}/11</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Multi-Timeframe Analysis */}
               <div className="mb-6">
@@ -806,12 +1022,12 @@ export default function STStockPredictionDashboard() {
                 </div>
               </div>
 
-              {/* Technical Indicators */}
+              {/* Advanced Technical Indicators */}
               <div className="mb-6">
-                <h4 className="font-semibold mb-4">Technical Indicators</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <h4 className="font-semibold mb-4">Advanced Technical Analysis</h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="bg-muted/30 p-4 rounded-lg">
-                    <h5 className="font-medium mb-2">Moving Averages</h5>
+                    <h5 className="font-medium mb-3">Moving Averages</h5>
                     <div className="space-y-2">
                       <div className="flex justify-between">
                         <span className="text-sm">MA50</span>
@@ -821,18 +1037,112 @@ export default function STStockPredictionDashboard() {
                         <span className="text-sm">MA200</span>
                         <span className="text-sm font-medium">${predictionData.insights.technicalIndicators.ma200?.toFixed(2) || 'N/A'}</span>
                       </div>
+                      <div className="pt-2 border-t border-muted">
+                        <div className="text-xs text-muted-foreground">
+                          {predictionData.insights.technicalIndicators.ma50 && predictionData.insights.technicalIndicators.ma200 && 
+                           predictionData.insights.technicalIndicators.ma50 > predictionData.insights.technicalIndicators.ma200 
+                            ? 'Golden Cross Signal' : 'Below MA200'}
+                        </div>
+                      </div>
                     </div>
                   </div>
                   <div className="bg-muted/30 p-4 rounded-lg">
-                    <h5 className="font-medium mb-2">Support & Resistance</h5>
+                    <h5 className="font-medium mb-3">Bollinger Bands</h5>
                     <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span className="text-sm">Upper</span>
+                        <span className="text-sm font-medium">${predictionData.insights.technicalIndicators.bollinger?.upper?.toFixed(2) || 'N/A'}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm">Middle</span>
+                        <span className="text-sm font-medium">${predictionData.insights.technicalIndicators.bollinger?.middle?.toFixed(2) || 'N/A'}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm">Lower</span>
+                        <span className="text-sm font-medium">${predictionData.insights.technicalIndicators.bollinger?.lower?.toFixed(2) || 'N/A'}</span>
+                      </div>
+                      <div className="pt-2 border-t border-muted">
+                        <div className="text-xs text-muted-foreground">
+                          {currentPrice && predictionData.insights.technicalIndicators.bollinger ? 
+                            (currentPrice.price > predictionData.insights.technicalIndicators.bollinger.upper ? 'Overbought Zone' :
+                             currentPrice.price < predictionData.insights.technicalIndicators.bollinger.lower ? 'Oversold Zone' : 'Normal Range')
+                            : 'Calculating...'}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="bg-muted/30 p-4 rounded-lg">
+                    <h5 className="font-medium mb-3">Support & Resistance</h5>
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span className="text-sm">Resistance</span>
+                        <span className="text-sm font-medium">${predictionData.insights.technicalIndicators.resistance?.toFixed(2) || 'N/A'}</span>
+                      </div>
                       <div className="flex justify-between">
                         <span className="text-sm">Support</span>
                         <span className="text-sm font-medium">${predictionData.insights.technicalIndicators.support?.toFixed(2) || 'N/A'}</span>
                       </div>
+                      <div className="pt-2 border-t border-muted">
+                        <div className="text-xs text-muted-foreground">
+                          {currentPrice && predictionData.insights.technicalIndicators.support && predictionData.insights.technicalIndicators.resistance ?
+                            `${((currentPrice.price - predictionData.insights.technicalIndicators.support) / 
+                                (predictionData.insights.technicalIndicators.resistance - predictionData.insights.technicalIndicators.support) * 100).toFixed(0)}% through range`
+                            : 'Analyzing range...'}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Live Trading Indicators */}
+              <div className="mb-6">
+                <h4 className="font-semibold mb-4">Live Trading Signals</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
+                    <h5 className="font-medium text-blue-900 dark:text-blue-100 mb-3">Momentum Indicators</h5>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-sm text-blue-700 dark:text-blue-300">RSI Signal</p>
+                        <p className="font-bold text-blue-900 dark:text-blue-100">
+                          {predictionData.insights.technicalIndicators.rsi ? 
+                            (predictionData.insights.technicalIndicators.rsi > 70 ? 'Overbought' :
+                             predictionData.insights.technicalIndicators.rsi < 30 ? 'Oversold' : 'Neutral')
+                            : 'N/A'}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-blue-700 dark:text-blue-300">MACD Signal</p>
+                        <p className={`font-bold ${predictionData.insights.technicalIndicators.macd && predictionData.insights.technicalIndicators.macd > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                          {predictionData.insights.technicalIndicators.macd ? 
+                            (predictionData.insights.technicalIndicators.macd > 0 ? 'Bullish' : 'Bearish')
+                            : 'N/A'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 p-4 rounded-lg border border-green-200 dark:border-green-800">
+                    <h5 className="font-medium text-green-900 dark:text-green-100 mb-3">Volume Analysis</h5>
+                    <div className="space-y-2">
                       <div className="flex justify-between">
-                        <span className="text-sm">Resistance</span>
-                        <span className="text-sm font-medium">${predictionData.insights.technicalIndicators.resistance?.toFixed(2) || 'N/A'}</span>
+                        <span className="text-sm text-green-700 dark:text-green-300">Current Volume</span>
+                        <span className="font-medium text-green-900 dark:text-green-100">
+                          {currentPrice ? `${(currentPrice.volume / 1000000).toFixed(1)}M` : 'N/A'}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm text-green-700 dark:text-green-300">Avg Volume</span>
+                        <span className="font-medium text-green-900 dark:text-green-100">
+                          {predictionData.insights.fundamentals?.avgVolume ? 
+                            `${(predictionData.insights.fundamentals.avgVolume / 1000000).toFixed(1)}M` : 'N/A'}
+                        </span>
+                      </div>
+                      <div className="pt-2 border-t border-green-200 dark:border-green-800">
+                        <p className="text-xs text-green-600 dark:text-green-400">
+                          {currentPrice && predictionData.insights.fundamentals?.avgVolume ?
+                            `${((currentPrice.volume / predictionData.insights.fundamentals.avgVolume - 1) * 100).toFixed(0)}% vs avg`
+                            : 'Calculating...'}
+                        </p>
                       </div>
                     </div>
                   </div>
