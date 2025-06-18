@@ -129,6 +129,7 @@ export default function STStockPredictionDashboard() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [accuracyDataType, setAccuracyDataType] = useState<'original' | 'normalized'>('original');
 
   const timeframes = [
     { value: "1d", label: "1 Day" },
@@ -324,25 +325,53 @@ export default function STStockPredictionDashboard() {
     if (actualPrices.length === 0 || predictedPrices.length === 0) return null;
 
     let sumSquaredErrors = 0;
+    let sumSquaredErrorsNormalized = 0;
     let comparisonCount = 0;
+
+    // Calculate normalization parameters for the actual prices
+    const actualValues = actualPrices.map(item => item.price);
+    const minActual = Math.min(...actualValues);
+    const maxActual = Math.max(...actualValues);
+    const rangeActual = maxActual - minActual;
 
     actualPrices.forEach(actual => {
       const predicted = predictedPrices.find(pred => pred.date === actual.date);
       if (predicted) {
+        // Original data MSE calculation
         const error = actual.price - predicted.price;
         sumSquaredErrors += error * error;
+
+        // Normalized data MSE calculation
+        const actualNorm = rangeActual > 0 ? (actual.price - minActual) / rangeActual : 0;
+        const predictedNorm = rangeActual > 0 ? (predicted.price - minActual) / rangeActual : 0;
+        const errorNorm = actualNorm - predictedNorm;
+        sumSquaredErrorsNormalized += errorNorm * errorNorm;
+
         comparisonCount++;
       }
     });
 
     if (comparisonCount === 0) return null;
 
-    const mse = sumSquaredErrors / comparisonCount;
+    const mseOriginal = sumSquaredErrors / comparisonCount;
+    const mseNormalized = sumSquaredErrorsNormalized / comparisonCount;
+
     return {
-      mse: mse,
-      rmse: Math.sqrt(mse),
+      original: {
+        mse: mseOriginal,
+        rmse: Math.sqrt(mseOriginal)
+      },
+      normalized: {
+        mse: mseNormalized,
+        rmse: Math.sqrt(mseNormalized)
+      },
       comparisonPeriod: `${actualPrices[0]?.date} to ${actualPrices[actualPrices.length - 1]?.date}`,
-      dataPoints: comparisonCount
+      dataPoints: comparisonCount,
+      dataRange: {
+        min: minActual,
+        max: maxActual,
+        range: rangeActual
+      }
     };
   };
 
@@ -576,11 +605,20 @@ export default function STStockPredictionDashboard() {
                   const accuracy = calculateAccuracy();
                   return accuracy && (
                     <div className="flex items-center space-x-2">
+                      <Select value={accuracyDataType} onValueChange={(value: 'original' | 'normalized') => setAccuracyDataType(value)}>
+                        <SelectTrigger className="w-32 h-7 text-xs">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="original">Original Data</SelectItem>
+                          <SelectItem value="normalized">Normalized Data</SelectItem>
+                        </SelectContent>
+                      </Select>
                       <Badge variant="outline" className="text-xs">
-                        MSE: {accuracy.mse.toFixed(3)}
+                        MSE: {accuracy[accuracyDataType].mse.toFixed(accuracyDataType === 'original' ? 3 : 6)}
                       </Badge>
                       <Badge variant="outline" className="text-xs">
-                        RMSE: {accuracy.rmse.toFixed(3)}
+                        RMSE: {accuracy[accuracyDataType].rmse.toFixed(accuracyDataType === 'original' ? 3 : 6)}
                       </Badge>
                       <Badge variant="secondary" className="text-xs">
                         {accuracy.dataPoints} days compared
@@ -691,17 +729,29 @@ export default function STStockPredictionDashboard() {
                     <h4 className="font-semibold text-green-900 dark:text-green-100 mb-2">
                       Prediction Accuracy Analysis
                     </h4>
+                    <div className="mb-3 flex justify-between items-center">
+                      <span className="text-green-700 dark:text-green-300 font-medium text-sm">Accuracy Calculation Type:</span>
+                      <Select value={accuracyDataType} onValueChange={(value: 'original' | 'normalized') => setAccuracyDataType(value)}>
+                        <SelectTrigger className="w-40 h-8 text-xs">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="original">Original Data</SelectItem>
+                          <SelectItem value="normalized">Normalized Data</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
                       <div>
-                        <span className="text-green-700 dark:text-green-300 font-medium">MSE:</span>
+                        <span className="text-green-700 dark:text-green-300 font-medium">MSE ({accuracyDataType}):</span>
                         <div className="text-lg font-bold text-green-900 dark:text-green-100">
-                          {accuracy.mse.toFixed(3)}
+                          {accuracy[accuracyDataType].mse.toFixed(accuracyDataType === 'original' ? 3 : 6)}
                         </div>
                       </div>
                       <div>
-                        <span className="text-green-700 dark:text-green-300 font-medium">RMSE:</span>
+                        <span className="text-green-700 dark:text-green-300 font-medium">RMSE ({accuracyDataType}):</span>
                         <div className="text-lg font-bold text-green-900 dark:text-green-100">
-                          {accuracy.rmse.toFixed(3)}
+                          {accuracy[accuracyDataType].rmse.toFixed(accuracyDataType === 'original' ? 3 : 6)}
                         </div>
                       </div>
                       <div>
@@ -717,6 +767,17 @@ export default function STStockPredictionDashboard() {
                         </div>
                       </div>
                     </div>
+                    {accuracyDataType === 'normalized' && (
+                      <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-950/20 rounded border border-blue-200 dark:border-blue-800">
+                        <p className="text-xs text-blue-700 dark:text-blue-300">
+                          <strong>Normalized Data Range:</strong> ${accuracy.dataRange.min.toFixed(2)} - ${accuracy.dataRange.max.toFixed(2)} 
+                          (Range: ${accuracy.dataRange.range.toFixed(2)})
+                        </p>
+                        <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
+                          Normalized values are scaled to [0,1] range for comparison independent of price magnitude.
+                        </p>
+                      </div>
+                    )}
                   </div>
                 );
               })()}
