@@ -5,3 +5,8 @@ numpy
 flask
 matplotlib
 pandas
+matplotlib
+numpy
+pandas
+scikit-learn
+yfinance

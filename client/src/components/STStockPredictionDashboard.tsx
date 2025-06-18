@@ -129,7 +129,7 @@ export default function STStockPredictionDashboard() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
-  const [accuracyDataType, setAccuracyDataType] = useState<'original' | 'normalized'>('original');
+  const [accuracyDataType, setAccuracyDataType] = useState<'original' | 'minmax' | 'zscore'>('original');
 
   const timeframes = [
     { value: "1d", label: "1 Day" },
@@ -325,14 +325,22 @@ export default function STStockPredictionDashboard() {
     if (actualPrices.length === 0 || predictedPrices.length === 0) return null;
 
     let sumSquaredErrors = 0;
-    let sumSquaredErrorsNormalized = 0;
+    let sumSquaredErrorsMinMax = 0;
+    let sumSquaredErrorsZScore = 0;
     let comparisonCount = 0;
 
-    // Calculate normalization parameters for the actual prices
-    const actualValues = actualPrices.map(item => item.price);
-    const minActual = Math.min(...actualValues);
-    const maxActual = Math.max(...actualValues);
-    const rangeActual = maxActual - minActual;
+    // Calculate normalization parameters from all data points (actual + predicted)
+    const allValues = [...actualPrices.map(item => item.price), ...predictedPrices.map(item => item.price)];
+    
+    // Min-Max Scaling parameters
+    const minValue = Math.min(...allValues);
+    const maxValue = Math.max(...allValues);
+    const range = maxValue - minValue;
+
+    // Z-score parameters (mean and standard deviation)
+    const mean = allValues.reduce((sum, val) => sum + val, 0) / allValues.length;
+    const variance = allValues.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / allValues.length;
+    const stdDev = Math.sqrt(variance);
 
     actualPrices.forEach(actual => {
       const predicted = predictedPrices.find(pred => pred.date === actual.date);
@@ -341,11 +349,17 @@ export default function STStockPredictionDashboard() {
         const error = actual.price - predicted.price;
         sumSquaredErrors += error * error;
 
-        // Normalized data MSE calculation
-        const actualNorm = rangeActual > 0 ? (actual.price - minActual) / rangeActual : 0;
-        const predictedNorm = rangeActual > 0 ? (predicted.price - minActual) / rangeActual : 0;
-        const errorNorm = actualNorm - predictedNorm;
-        sumSquaredErrorsNormalized += errorNorm * errorNorm;
+        // Min-Max normalization (0-1 range): X_normalized = (X - X_min) / (X_max - X_min)
+        const actualMinMax = range > 0 ? (actual.price - minValue) / range : 0;
+        const predictedMinMax = range > 0 ? (predicted.price - minValue) / range : 0;
+        const errorMinMax = actualMinMax - predictedMinMax;
+        sumSquaredErrorsMinMax += errorMinMax * errorMinMax;
+
+        // Z-score normalization (mean=0, std=1): Z = (X - μ) / σ
+        const actualZScore = stdDev > 0 ? (actual.price - mean) / stdDev : 0;
+        const predictedZScore = stdDev > 0 ? (predicted.price - mean) / stdDev : 0;
+        const errorZScore = actualZScore - predictedZScore;
+        sumSquaredErrorsZScore += errorZScore * errorZScore;
 
         comparisonCount++;
       }
@@ -354,23 +368,27 @@ export default function STStockPredictionDashboard() {
     if (comparisonCount === 0) return null;
 
     const mseOriginal = sumSquaredErrors / comparisonCount;
-    const mseNormalized = sumSquaredErrorsNormalized / comparisonCount;
+    const mseMinMax = sumSquaredErrorsMinMax / comparisonCount;
+    const mseZScore = sumSquaredErrorsZScore / comparisonCount;
 
     return {
       original: {
         mse: mseOriginal,
         rmse: Math.sqrt(mseOriginal)
       },
-      normalized: {
-        mse: mseNormalized,
-        rmse: Math.sqrt(mseNormalized)
+      minmax: {
+        mse: mseMinMax,
+        rmse: Math.sqrt(mseMinMax)
+      },
+      zscore: {
+        mse: mseZScore,
+        rmse: Math.sqrt(mseZScore)
       },
       comparisonPeriod: `${actualPrices[0]?.date} to ${actualPrices[actualPrices.length - 1]?.date}`,
       dataPoints: comparisonCount,
-      dataRange: {
-        min: minActual,
-        max: maxActual,
-        range: rangeActual
+      normalizationParams: {
+        minmax: { min: minValue, max: maxValue, range: range },
+        zscore: { mean: mean, std: stdDev, variance: variance }
       }
     };
   };
@@ -605,13 +623,14 @@ export default function STStockPredictionDashboard() {
                   const accuracy = calculateAccuracy();
                   return accuracy && (
                     <div className="flex items-center space-x-2">
-                      <Select value={accuracyDataType} onValueChange={(value: 'original' | 'normalized') => setAccuracyDataType(value)}>
-                        <SelectTrigger className="w-32 h-7 text-xs">
+                      <Select value={accuracyDataType} onValueChange={(value: 'original' | 'minmax' | 'zscore') => setAccuracyDataType(value)}>
+                        <SelectTrigger className="w-36 h-7 text-xs">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="original">Original Data</SelectItem>
-                          <SelectItem value="normalized">Normalized Data</SelectItem>
+                          <SelectItem value="minmax">Min-Max (0-1)</SelectItem>
+                          <SelectItem value="zscore">Z-score (μ=0)</SelectItem>
                         </SelectContent>
                       </Select>
                       <Badge variant="outline" className="text-xs">
@@ -731,13 +750,14 @@ export default function STStockPredictionDashboard() {
                     </h4>
                     <div className="mb-3 flex justify-between items-center">
                       <span className="text-green-700 dark:text-green-300 font-medium text-sm">Accuracy Calculation Type:</span>
-                      <Select value={accuracyDataType} onValueChange={(value: 'original' | 'normalized') => setAccuracyDataType(value)}>
+                      <Select value={accuracyDataType} onValueChange={(value: 'original' | 'minmax' | 'zscore') => setAccuracyDataType(value)}>
                         <SelectTrigger className="w-40 h-8 text-xs">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="original">Original Data</SelectItem>
-                          <SelectItem value="normalized">Normalized Data</SelectItem>
+                          <SelectItem value="minmax">Min-Max (0-1)</SelectItem>
+                          <SelectItem value="zscore">Z-score (μ=0)</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -767,14 +787,27 @@ export default function STStockPredictionDashboard() {
                         </div>
                       </div>
                     </div>
-                    {accuracyDataType === 'normalized' && (
+                    {accuracyDataType === 'minmax' && (
                       <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-950/20 rounded border border-blue-200 dark:border-blue-800">
                         <p className="text-xs text-blue-700 dark:text-blue-300">
-                          <strong>Normalized Data Range:</strong> ${accuracy.dataRange.min.toFixed(2)} - ${accuracy.dataRange.max.toFixed(2)} 
-                          (Range: ${accuracy.dataRange.range.toFixed(2)})
+                          <strong>Min-Max Normalization Range:</strong> ${accuracy.normalizationParams.minmax.min.toFixed(2)} - ${accuracy.normalizationParams.minmax.max.toFixed(2)} 
+                          (Range: ${accuracy.normalizationParams.minmax.range.toFixed(2)})
                         </p>
                         <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
-                          Normalized values are scaled to [0,1] range for comparison independent of price magnitude.
+                          <strong>Formula:</strong> X_normalized = (X - X_min) / (X_max - X_min)<br/>
+                          Values are scaled to [0,1] range for comparison independent of price magnitude.
+                        </p>
+                      </div>
+                    )}
+                    {accuracyDataType === 'zscore' && (
+                      <div className="mt-3 p-3 bg-purple-50 dark:bg-purple-950/20 rounded border border-purple-200 dark:border-purple-800">
+                        <p className="text-xs text-purple-700 dark:text-purple-300">
+                          <strong>Z-score Parameters:</strong> Mean = ${accuracy.normalizationParams.zscore.mean.toFixed(2)}, 
+                          Std Dev = ${accuracy.normalizationParams.zscore.std.toFixed(2)}
+                        </p>
+                        <p className="text-xs text-purple-600 dark:text-purple-400 mt-1">
+                          <strong>Formula:</strong> Z = (X - μ) / σ<br/>
+                          Values are standardized with mean≈0 and standard deviation≈1.
                         </p>
                       </div>
                     )}
