@@ -25,7 +25,7 @@ export default function Navigation() {
                   </Link>
                   <Link href="/stm-demo">
                     <Button variant="ghost" size="sm" className="flex items-center space-x-2">
-                      <span>STM Demo</span>
+                      <span>Demo</span>
                     </Button>
                   </Link>
                 </div>
