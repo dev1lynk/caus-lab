@@ -21,7 +21,7 @@ export default function Dashboard() {
                 Projects & Documentation
               </h1>
               <p className="text-muted-foreground">
-                Explore sample projects and comprehensive documentation for the Caus Lab platform
+                Explore sample projects and comprehensive documentation for the CAUS Lab platform
               </p>
             </div>
           </div>

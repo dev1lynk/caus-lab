@@ -7,7 +7,7 @@ export default function Footer() {
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <ChartGantt className="text-primary text-xl mr-2" />
-            <span className="font-semibold text-foreground">Caus Lab</span>
+            <span className="font-semibold text-foreground">CAUS Lab</span>
           </div>
           <div className="flex items-center space-x-6 text-sm text-muted-foreground">
             <a href="#" className="hover:text-foreground transition-colors">

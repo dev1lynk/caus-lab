@@ -39,7 +39,7 @@ export function useProject(projectId: number | null) {
       
       toast({
         title: "Project created",
-        description: "Your new Caus Lab project has been created successfully.",
+        description: "Your new CAUS Lab project has been created successfully.",
       });
     },
     onError: (error: Error) => {

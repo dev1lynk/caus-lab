@@ -33,7 +33,7 @@ export default function Landing() {
               <Brain className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-gray-900 dark:text-white">Caus Lab</h1>
+              <h1 className="text-xl font-bold text-gray-900 dark:text-white">CAUS Lab</h1>
               <p className="text-xs text-gray-600 dark:text-gray-400">Generative Scenario Simulation</p>
             </div>
           </div>
@@ -55,7 +55,7 @@ export default function Landing() {
           </Badge>
           
           <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent leading-tight">
-            Welcome to Caus Lab
+            Welcome to CAUS Lab
           </h1>
           
           <h2 className="text-2xl md:text-3xl font-semibold text-gray-800 dark:text-gray-200 mb-8">
@@ -63,7 +63,7 @@ export default function Landing() {
           </h2>
           
           <p className="text-xl text-gray-600 dark:text-gray-300 mb-12 leading-relaxed max-w-3xl mx-auto">
-            Step into a new era of decision-making with Caus Lab, the generative AI platform that empowers you to 
+            Step into a new era of decision-making with CAUS Lab, the generative AI platform that empowers you to 
             explore, simulate, and analyze complex time-series scenarios—no matter your industry or use case.
           </p>
           
@@ -88,11 +88,11 @@ export default function Landing() {
       <section className="container mx-auto px-4 py-16">
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-            Why Choose Caus Lab?
+            Why Choose CAUS Lab?
           </h2>
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
             Whether you're optimizing business operations, planning resource allocation, or preparing for 
-            unexpected events, Caus Lab gives you the tools to visualize multiple possible futures.
+            unexpected events, CAUS Lab gives you the tools to visualize multiple possible futures.
           </p>
         </div>
 
@@ -121,7 +121,7 @@ export default function Landing() {
             </CardHeader>
             <CardContent>
               <p className="text-gray-600 dark:text-gray-300">
-                Caus Lab models cause-and-effect relationships to reveal how your interventions 
+                CAUS Lab models cause-and-effect relationships to reveal how your interventions 
                 shape outcomes, providing deeper insights than correlation-based approaches.
               </p>
             </CardContent>
@@ -194,11 +194,11 @@ export default function Landing() {
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-              Caus Lab Adapts to Your World
+              CAUS Lab Adapts to Your World
             </h2>
             <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
               From finance and investment to logistics, operations, and crisis management—
-              Caus Lab transforms decision-making across every industry.
+              CAUS Lab transforms decision-making across every industry.
             </p>
           </div>
 
@@ -363,7 +363,7 @@ export default function Landing() {
             Start Shaping Your Future with Confidence
           </h2>
           <p className="text-xl text-gray-600 dark:text-gray-300 mb-12 max-w-3xl mx-auto">
-            Join forward-thinking organizations already using Caus Lab to make better decisions, 
+            Join forward-thinking organizations already using CAUS Lab to make better decisions, 
             reduce risks, and unlock new opportunities through advanced scenario simulation.
           </p>
           
@@ -405,7 +405,7 @@ export default function Landing() {
                 <Brain className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h3 className="font-bold">Caus Lab</h3>
+                <h3 className="font-bold">CAUS Lab</h3>
                 <p className="text-xs text-gray-400">Generative Scenario Simulation</p>
               </div>
             </div>
@@ -414,7 +414,7 @@ export default function Landing() {
                 Transform your decision-making with AI-powered causal modeling
               </p>
               <p className="text-gray-500 text-xs">
-                © 2025 Caus Lab. Powered by advanced T-NCM-VAE technology.
+                © 2025 CAUS Lab. Powered by advanced T-NCM-VAE technology.
               </p>
             </div>
           </div>
