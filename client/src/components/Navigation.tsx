@@ -14,7 +14,7 @@ export default function Navigation() {
           <div className="flex items-center">
             <Link href="/" className="flex-shrink-0 flex items-center cursor-pointer">
               <Brain className="text-primary text-2xl mr-3" />
-              <span className="text-xl font-bold text-foreground">Causal AI</span>
+              <span className="text-xl font-bold text-foreground">Caus Lab</span>
             </Link>
             {location !== "/" && (
               <div className="hidden md:block ml-10">

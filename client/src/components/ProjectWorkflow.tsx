@@ -108,11 +108,11 @@ export default function ProjectWorkflow() {
       {/* Header */}
       <div className="text-center">
         <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-          Causal AI Project Workflow
+          Caus Lab Project Workflow
         </h2>
         <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
           Experience the power of generative scenario simulation through our intuitive 4-step process. 
-          From data upload to actionable insights, Causal AI transforms your raw data into predictive intelligence.
+          From data upload to actionable insights, Caus Lab transforms your raw data into predictive intelligence.
         </p>
       </div>
 
@@ -205,7 +205,7 @@ export default function ProjectWorkflow() {
               <div>
                 <CardTitle className="text-xl">STM Stock Prediction Demo</CardTitle>
                 <p className="text-sm text-gray-600 dark:text-gray-300">
-                  See Causal AI in action with semiconductor stock analysis
+                  See Caus Lab in action with semiconductor stock analysis
                 </p>
               </div>
             </div>
@@ -260,7 +260,7 @@ export default function ProjectWorkflow() {
               <Badge variant="outline" className="text-orange-600 border-orange-200">Healthcare</Badge>
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-300">
-              Upload your data and let Causal AI create custom predictive models tailored to your industry's unique patterns and requirements.
+              Upload your data and let Caus Lab create custom predictive models tailored to your industry's unique patterns and requirements.
             </p>
             <Button variant="outline" className="w-full border-green-200 text-green-600 hover:bg-green-50">
               Start Custom Project
@@ -276,7 +276,7 @@ export default function ProjectWorkflow() {
           Ready to Transform Your Decision-Making?
         </h3>
         <p className="text-gray-600 dark:text-gray-300 mb-6 max-w-2xl mx-auto">
-          Join the future of predictive analytics with Causal AI. Start building scenarios that 
+          Join the future of predictive analytics with Caus Lab. Start building scenarios that 
           shape your business outcomes today.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">

@@ -26,7 +26,7 @@ export default function DocumentationContent() {
         </h2>
         <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
           Comprehensive guides, tutorials, and reference materials to help you master 
-          Causal AI's advanced scenario simulation capabilities.
+          Caus Lab's advanced scenario simulation capabilities.
         </p>
       </div>
 
