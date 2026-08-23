@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Brain, User } from "lucide-react";
 import { Link, useLocation } from "wouter";
 
@@ -34,12 +33,6 @@ export default function Navigation() {
             )}
           </div>
           <div className="flex items-center space-x-4">
-            <Badge variant="secondary" className="text-xs">
-              Free Plan
-            </Badge>
-            <Button size="sm" className="gradient-primary text-primary-foreground">
-              Upgrade
-            </Button>
             <Avatar className="h-8 w-8">
               <AvatarFallback>
                 <User className="h-4 w-4" />
