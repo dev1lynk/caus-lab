@@ -11,6 +11,7 @@ import {
   ArrowRight,
   CheckCircle,
   BookOpen,
+  BrainCircuit,
   Target,
   LineChart,
   Building2,
@@ -78,6 +79,12 @@ export default function Landing() {
               <Button size="lg" variant="outline" className="px-8 py-4 text-lg">
                 Terminology
                 <BookOpen className="w-5 h-5 ml-2" />
+              </Button>
+            </Link>
+            <Link href="/causal-foundation-model">
+              <Button size="lg" variant="outline" className="px-8 py-4 text-lg">
+                What Is a Causal Foundation Model?
+                <BrainCircuit className="w-5 h-5 ml-2 shrink-0" />
               </Button>
             </Link>
           </div>
