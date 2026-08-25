@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Link } from "wouter";
 import { 
   Brain, 
@@ -11,7 +10,6 @@ import {
   Shield,
   ArrowRight,
   CheckCircle,
-  Sparkles,
   Target,
   LineChart,
   Building2,
@@ -49,11 +47,6 @@ export default function Landing() {
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-16 text-center">
         <div className="max-w-4xl mx-auto">
-          <Badge variant="outline" className="mb-6 px-4 py-2 bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900 dark:text-blue-200 dark:border-blue-700">
-            <Sparkles className="w-4 h-4 mr-2" />
-            Powered by Advanced T-NCM-VAE Modeling
-          </Badge>
-          
           <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent leading-tight">
             Welcome to CAUS Lab
           </h1>
