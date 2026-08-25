@@ -406,9 +406,6 @@ export default function Landing() {
               <p className="text-gray-400 text-sm mb-2">
                 Transform your decision-making with AI-powered causal modeling
               </p>
-              <p className="text-gray-500 text-xs">
-                © 2025 CAUS Lab. Powered by advanced T-NCM-VAE technology.
-              </p>
             </div>
           </div>
         </div>
