@@ -9,12 +9,12 @@ export function useProject(projectId: number | null) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: project, isLoading, error } = useQuery({
+  const { data: project, isLoading, error } = useQuery<Project>({
     queryKey: [`/api/projects/${projectId}`],
     enabled: !!projectId,
     refetchInterval: (data) => {
       // Poll every 2 seconds if training is in progress
-      return data?.status === 'training' ? 2000 : false;
+      return data.state.data?.status === 'training' ? 2000 : false;
     },
   });
 

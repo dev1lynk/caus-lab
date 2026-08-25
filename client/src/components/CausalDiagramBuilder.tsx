@@ -85,7 +85,7 @@ export default function CausalDiagramBuilder({ project }: CausalDiagramBuilderPr
     
     // Mock auto-detection with some default relationships
     setTimeout(() => {
-      const variables = project.variables;
+      const variables = project.variables || [];
       if (variables.length >= 2) {
         const newLinks: CausalLink[] = [];
         

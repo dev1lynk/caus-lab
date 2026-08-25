@@ -1,4 +1,4 @@
-import type { Express } from "express";
+import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import multer from "multer";
@@ -500,6 +500,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/stock/predict-with-variables', async (req: Request, res: Response) => {
     try {
       const { variables, timeframe } = req.body;
+
+      if (!tncmModel) {
+        res.status(503).json({ message: "Prediction model is unavailable" });
+        return;
+      }
       
       // Get current market data
       const [currentPrice, insights] = await Promise.all([

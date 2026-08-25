@@ -65,7 +65,7 @@ export default function ScenarioSimulation({ project }: ScenarioSimulationProps)
                 <SelectValue placeholder="Select variable..." />
               </SelectTrigger>
               <SelectContent>
-                {project.variables.filter(v => v.type === 'input').map((variable) => (
+                {(project.variables || []).filter(v => v.type === 'input').map((variable) => (
                   <SelectItem key={variable.id} value={variable.id}>
                     {variable.name}
                   </SelectItem>

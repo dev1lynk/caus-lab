@@ -206,7 +206,7 @@ export default function ResultsDashboard({ project }: ResultsDashboardProps) {
               </div>
             </div>
             <div className="mt-3 space-y-2">
-              {project.variables.slice(0, 3).map((variable, index) => {
+              {(project.variables || []).slice(0, 3).map((variable, index) => {
                 const impacts = ['+$8.4K', '+$5.2K', '+$2.1K'];
                 const changes = ['+10%', '+1 person', '-20%'];
                 return (

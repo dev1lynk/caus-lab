@@ -267,7 +267,7 @@ export default function StockPredictionDashboard({ project }: StockPredictionDas
   };
 
   // Use adjusted prediction for charts if available, otherwise use original
-  const currentPredictionData = adjustedPrediction || predictionData;
+  const currentPredictionData = (adjustedPrediction || predictionData)!;
 
   return (
     <div className="space-y-6">

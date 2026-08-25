@@ -63,6 +63,12 @@ export class MemStorage implements IStorage {
     const project: Project = {
       ...insertProject,
       id,
+      status: insertProject.status ?? "upload",
+      dataRows: insertProject.dataRows ?? 0,
+      variables: (insertProject.variables ?? []) as Variable[],
+      causalLinks: (insertProject.causalLinks ?? []) as CausalLink[],
+      trainedModel: (insertProject.trainedModel ?? null) as Project["trainedModel"],
+      results: (insertProject.results ?? null) as ProjectResults | null,
       createdAt: now,
       expiresAt,
     };
@@ -89,6 +95,7 @@ export class MemStorage implements IStorage {
     const data: UploadedData = {
       ...insertData,
       id,
+      data: insertData.data as Record<string, any>[],
       uploadedAt: new Date(),
     };
     

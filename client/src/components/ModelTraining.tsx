@@ -74,9 +74,12 @@ export default function ModelTraining({ project }: ModelTrainingProps) {
     }
   };
 
-  const canTrain = project.variables.length > 0 && 
-                   project.causalLinks.length > 0 && 
-                   project.dataRows > 0 &&
+  const variables = project.variables || [];
+  const causalLinks = project.causalLinks || [];
+  const dataRows = project.dataRows || 0;
+  const canTrain = variables.length > 0 &&
+                   causalLinks.length > 0 &&
+                   dataRows > 0 &&
                    project.status !== 'training';
 
   return (
@@ -92,19 +95,19 @@ export default function ModelTraining({ project }: ModelTrainingProps) {
           <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
             <span className="text-sm text-muted-foreground">Data Points</span>
             <span className="text-sm font-medium text-foreground">
-              {project.dataRows.toLocaleString()} rows
+              {dataRows.toLocaleString()} rows
             </span>
           </div>
           <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
             <span className="text-sm text-muted-foreground">Variables</span>
             <span className="text-sm font-medium text-foreground">
-              {project.variables.length} connected
+              {variables.length} connected
             </span>
           </div>
           <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
             <span className="text-sm text-muted-foreground">Causal Links</span>
             <span className="text-sm font-medium text-foreground">
-              {project.causalLinks.length} defined
+              {causalLinks.length} defined
             </span>
           </div>
           <div className="flex items-center justify-between p-3 bg-muted rounded-lg">

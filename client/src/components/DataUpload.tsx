@@ -189,7 +189,7 @@ export default function DataUpload({ project }: DataUploadProps) {
           <Alert>
             <FileText className="h-4 w-4" />
             <AlertDescription>
-              Data uploaded successfully! {project.dataRows} rows processed with {project.variables.length} variables.
+              Data uploaded successfully! {project.dataRows} rows processed with {project.variables?.length || 0} variables.
             </AlertDescription>
           </Alert>
         )}
