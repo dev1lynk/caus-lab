@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import Landing from "@/pages/Landing";
 import WorkflowPage from "@/pages/WorkflowPage";
 import STMDemo from "@/pages/STMDemo";
+import Terminology from "@/pages/Terminology";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -14,6 +15,7 @@ function Router() {
       <Route path="/" component={Landing} />
       <Route path="/workflow" component={WorkflowPage} />
       <Route path="/stm-demo" component={STMDemo} />
+      <Route path="/terminology" component={Terminology} />
       <Route component={NotFound} />
     </Switch>
   );

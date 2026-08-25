@@ -10,6 +10,7 @@ import {
   Shield,
   ArrowRight,
   CheckCircle,
+  BookOpen,
   Target,
   LineChart,
   Building2,
@@ -71,6 +72,12 @@ export default function Landing() {
               <Button size="lg" variant="outline" className="px-8 py-4 text-lg">
                 Watch Demo
                 <BarChart3 className="w-5 h-5 ml-2" />
+              </Button>
+            </Link>
+            <Link href="/terminology">
+              <Button size="lg" variant="outline" className="px-8 py-4 text-lg">
+                Terminology
+                <BookOpen className="w-5 h-5 ml-2" />
               </Button>
             </Link>
           </div>
