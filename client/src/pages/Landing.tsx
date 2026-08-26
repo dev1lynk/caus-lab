@@ -12,6 +12,7 @@ import {
   CheckCircle,
   BookOpen,
   BrainCircuit,
+  BriefcaseBusiness,
   Target,
   LineChart,
   Building2,
@@ -62,7 +63,7 @@ export default function Landing() {
             explore, simulate, and analyze complex time-series scenarios—no matter your industry or use case.
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col flex-wrap justify-center gap-4 sm:flex-row">
             <Link href="/workflow">
               <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 px-8 py-4 text-lg">
                 Start Simulating Now
@@ -85,6 +86,12 @@ export default function Landing() {
               <Button size="lg" variant="outline" className="px-8 py-4 text-lg">
                 What Is a Causal Foundation Model?
                 <BrainCircuit className="w-5 h-5 ml-2 shrink-0" />
+              </Button>
+            </Link>
+            <Link href="/our-service">
+              <Button size="lg" variant="outline" className="px-8 py-4 text-lg">
+                Our Service
+                <BriefcaseBusiness className="w-5 h-5 ml-2" />
               </Button>
             </Link>
           </div>

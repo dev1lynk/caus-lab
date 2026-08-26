@@ -1,0 +1,27 @@
+What We Do 
+
+CAUS helps companies figure out where cause-and-effect actually matters to a decision — and where it doesn't. 
+
+Most organizations are excellent at prediction and surprisingly under-equipped to answer a simpler question: if we change this, what will actually happen? That's the gap we work in. 
+
+Who We Work With 
+
+Leadership teams and analytics functions who are past the "what is machine learning" stage and are now facing a decision where getting the why wrong is expensive — a pricing change, a marketing spend reallocation, a process redesign, a policy decision. You don't need an existing data science team to start a conversation with us, but the work is most valuable to organizations that already have data and want to know if they're reading it correctly. 
+
+What We Offer 
+
+Causal Diagnostic A focused engagement to answer one specific question: is this relationship in your data actually causal, or are you looking at a correlation dressed up as one? We map the relevant variables, identify what's likely confounding the picture, and tell you plainly what the data can and can't support. This is often the right starting point if you're not sure causal inference applies to your situation yet. 
+
+Advisory & Strategic Guidance Ongoing or project-based advisory for teams evaluating whether and how to build causal inference into their decision-making — from evaluating vendor platforms, to scoping an internal pilot, to reviewing a model or analysis your team has already built. We act as an independent, technically grounded second opinion. 
+
+Embedded Project Work Hands-on collaboration with your team on a defined causal inference project — building a causal model for a specific business question, designing an experiment or natural-experiment analysis, or auditing an existing predictive model for causal validity before it drives a major decision. 
+
+Workshops & Team Training A practical introduction to causal thinking for analytics, strategy, or product teams — enough for your team to know when they're looking at a causal question, and when to bring in deeper expertise. Tailored to your industry and existing data maturity. 
+
+How We Work 
+
+We keep engagements small, direct, and outcome-specific. Every engagement starts with a conversation about the actual decision you're trying to get right, and we scope from there.  
+
+Get In Touch 
+
+If you're not sure whether your question is a causal one, that's a good reason to reach out, not a reason to wait. [Contact us] 

@@ -8,6 +8,7 @@ import WorkflowPage from "@/pages/WorkflowPage";
 import STMDemo from "@/pages/STMDemo";
 import Terminology from "@/pages/Terminology";
 import CausalFoundationModel from "@/pages/CausalFoundationModel";
+import OurService from "@/pages/OurService";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -18,6 +19,7 @@ function Router() {
       <Route path="/stm-demo" component={STMDemo} />
       <Route path="/terminology" component={Terminology} />
       <Route path="/causal-foundation-model" component={CausalFoundationModel} />
+      <Route path="/our-service" component={OurService} />
       <Route component={NotFound} />
     </Switch>
   );
