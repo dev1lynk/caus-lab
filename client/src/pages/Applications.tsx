@@ -21,7 +21,7 @@ type Position = { x: number; y: number };
 type Variable = {
   id: string;
   label: string;
-  role: "input" | "mechanism" | "outcome";
+  role: "treatment" | "mediator" | "outcome";
   baseline: number;
   unit: string;
   position: Position;
@@ -59,10 +59,10 @@ const applications: Application[] = [
     description: "Understand which commercial levers create sustainable revenue, rather than simply correlate with it.",
     causalQuestion: "What would happen to monthly revenue if we increased promotional support for high-intent customers?",
     variables: [
-      { id: "marketing", label: "Marketing spend", role: "input", baseline: 100, unit: "index", position: { x: 90, y: 76 } },
-      { id: "promotion", label: "Promotion depth", role: "input", baseline: 10, unit: "%", position: { x: 90, y: 204 } },
-      { id: "traffic", label: "Website traffic", role: "mechanism", baseline: 64, unit: "k visits", position: { x: 330, y: 76 } },
-      { id: "conversion", label: "Conversion rate", role: "mechanism", baseline: 4.2, unit: "%", position: { x: 330, y: 204 } },
+      { id: "marketing", label: "Marketing spend", role: "treatment", baseline: 100, unit: "index", position: { x: 90, y: 76 } },
+      { id: "promotion", label: "Promotion depth", role: "treatment", baseline: 10, unit: "%", position: { x: 90, y: 204 } },
+      { id: "traffic", label: "Website traffic", role: "mediator", baseline: 64, unit: "k visits", position: { x: 330, y: 76 } },
+      { id: "conversion", label: "Conversion rate", role: "mediator", baseline: 4.2, unit: "%", position: { x: 330, y: 204 } },
       { id: "revenue", label: "Monthly revenue", role: "outcome", baseline: 420, unit: "$k", position: { x: 610, y: 140 } },
     ],
     edges: [
@@ -86,11 +86,11 @@ const applications: Application[] = [
     description: "Trace how operational changes influence adherence, recovery, and patient outcomes.",
     causalQuestion: "Would adding a care coordinator reduce 30-day readmission risk for high-risk patients?",
     variables: [
-      { id: "coordination", label: "Care coordination", role: "input", baseline: 40, unit: "index", position: { x: 90, y: 76 } },
-      { id: "wait", label: "Follow-up wait", role: "mechanism", baseline: 7, unit: "days", position: { x: 90, y: 204 } },
-      { id: "adherence", label: "Treatment adherence", role: "mechanism", baseline: 68, unit: "%", position: { x: 330, y: 76 } },
-      { id: "risk", label: "Readmission risk", role: "mechanism", baseline: 18, unit: "%", position: { x: 330, y: 204 } },
-      { id: "outcomes", label: "Patient outcomes", role: "outcome", baseline: 72, unit: "index", position: { x: 610, y: 140 } },
+      { id: "coordination", label: "Care coordination", role: "treatment", baseline: 40, unit: "index", position: { x: 90, y: 140 } },
+      { id: "wait", label: "Follow-up wait", role: "mediator", baseline: 7, unit: "days", position: { x: 300, y: 204 } },
+      { id: "adherence", label: "Treatment adherence", role: "mediator", baseline: 68, unit: "%", position: { x: 300, y: 76 } },
+      { id: "risk", label: "Readmission risk", role: "mediator", baseline: 18, unit: "%", position: { x: 500, y: 140 } },
+      { id: "outcomes", label: "Patient outcomes", role: "outcome", baseline: 72, unit: "index", position: { x: 680, y: 140 } },
     ],
     edges: [
       { from: "coordination", to: "wait", weight: -0.42 },
@@ -114,10 +114,10 @@ const applications: Application[] = [
     description: "See how maintenance choices affect throughput, defects, and the cost of every unit produced.",
     causalQuestion: "What is the effect of increasing preventive maintenance on downtime and unit cost?",
     variables: [
-      { id: "maintenance", label: "Preventive maintenance", role: "input", baseline: 55, unit: "index", position: { x: 90, y: 76 } },
-      { id: "downtime", label: "Unplanned downtime", role: "mechanism", baseline: 12, unit: "hours", position: { x: 90, y: 204 } },
-      { id: "throughput", label: "Throughput", role: "mechanism", baseline: 820, unit: "units/day", position: { x: 330, y: 76 } },
-      { id: "defects", label: "Defect rate", role: "mechanism", baseline: 3.8, unit: "%", position: { x: 330, y: 204 } },
+      { id: "maintenance", label: "Preventive maintenance", role: "treatment", baseline: 55, unit: "index", position: { x: 90, y: 76 } },
+      { id: "downtime", label: "Unplanned downtime", role: "mediator", baseline: 12, unit: "hours", position: { x: 90, y: 204 } },
+      { id: "throughput", label: "Throughput", role: "mediator", baseline: 820, unit: "units/day", position: { x: 330, y: 76 } },
+      { id: "defects", label: "Defect rate", role: "mediator", baseline: 3.8, unit: "%", position: { x: 330, y: 204 } },
       { id: "unitcost", label: "Unit cost", role: "outcome", baseline: 14.5, unit: "$/unit", position: { x: 610, y: 140 } },
     ],
     edges: [
@@ -142,10 +142,10 @@ const applications: Application[] = [
     description: "Model how capacity and demand management can shift cost and carbon intensity across the grid.",
     causalQuestion: "Would adding battery storage reduce peak carbon intensity without increasing energy cost?",
     variables: [
-      { id: "solar", label: "Solar capacity", role: "input", baseline: 48, unit: "MW", position: { x: 90, y: 76 } },
-      { id: "demand", label: "Peak demand", role: "input", baseline: 82, unit: "MW", position: { x: 90, y: 204 } },
-      { id: "storage", label: "Storage level", role: "mechanism", baseline: 35, unit: "%", position: { x: 330, y: 76 } },
-      { id: "carbon", label: "Carbon intensity", role: "mechanism", baseline: 420, unit: "g/kWh", position: { x: 330, y: 204 } },
+      { id: "solar", label: "Solar capacity", role: "treatment", baseline: 48, unit: "MW", position: { x: 90, y: 76 } },
+      { id: "demand", label: "Peak demand", role: "treatment", baseline: 82, unit: "MW", position: { x: 90, y: 204 } },
+      { id: "storage", label: "Storage level", role: "mediator", baseline: 35, unit: "%", position: { x: 330, y: 76 } },
+      { id: "carbon", label: "Carbon intensity", role: "mediator", baseline: 420, unit: "g/kWh", position: { x: 330, y: 204 } },
       { id: "cost", label: "Energy cost", role: "outcome", baseline: 96, unit: "$/MWh", position: { x: 610, y: 140 } },
     ],
     edges: [
@@ -170,10 +170,10 @@ const applications: Application[] = [
     description: "Identify the operational levers that improve delivery promises while controlling fuel spend.",
     causalQuestion: "What would be the effect of adding fleet capacity on delivery time and customer satisfaction?",
     variables: [
-      { id: "fleet", label: "Fleet capacity", role: "input", baseline: 76, unit: "vehicles", position: { x: 90, y: 76 } },
-      { id: "fuel", label: "Fuel cost", role: "mechanism", baseline: 28, unit: "$k/week", position: { x: 90, y: 204 } },
-      { id: "delivery", label: "Delivery time", role: "mechanism", baseline: 2.8, unit: "days", position: { x: 330, y: 76 } },
-      { id: "ontime", label: "On-time rate", role: "mechanism", baseline: 88, unit: "%", position: { x: 330, y: 204 } },
+      { id: "fleet", label: "Fleet capacity", role: "treatment", baseline: 76, unit: "vehicles", position: { x: 90, y: 76 } },
+      { id: "fuel", label: "Fuel cost", role: "mediator", baseline: 28, unit: "$k/week", position: { x: 90, y: 204 } },
+      { id: "delivery", label: "Delivery time", role: "mediator", baseline: 2.8, unit: "days", position: { x: 330, y: 76 } },
+      { id: "ontime", label: "On-time rate", role: "mediator", baseline: 88, unit: "%", position: { x: 330, y: 204 } },
       { id: "satisfaction", label: "Customer satisfaction", role: "outcome", baseline: 74, unit: "index", position: { x: 610, y: 140 } },
     ],
     edges: [
@@ -327,10 +327,11 @@ export default function Applications() {
                     </CardTitle>
                     <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Arrows show direction; weights show the modeled relationship strength.</p>
                   </div>
-                  <div className="flex gap-2 text-xs">
-                    <span className="rounded-full bg-blue-100 px-2 py-1 font-medium text-blue-800 dark:bg-blue-950 dark:text-blue-200">Input</span>
-                    <span className="rounded-full bg-purple-100 px-2 py-1 font-medium text-purple-800 dark:bg-purple-950 dark:text-purple-200">Mechanism</span>
-                    <span className="rounded-full bg-emerald-100 px-2 py-1 font-medium text-emerald-800 dark:bg-emerald-950 dark:text-emerald-200">Outcome</span>
+                  <div className="flex max-w-xl flex-wrap items-center justify-end gap-2 text-xs">
+                    <span className="rounded-full bg-[#EEEDFB] px-2 py-1 font-medium text-[#4F46E5]">Treatment</span>
+                    <span className="rounded-full border border-[#C9C8DC] bg-white px-2 py-1 font-medium text-slate-600">Mediators</span>
+                    <span className="rounded-full bg-[#EEEDFB] px-2 py-1 font-medium text-[#4F46E5]">Outcome</span>
+                    <span className="basis-full text-right italic text-slate-500"><em>mechanism</em> — the functional relationship by which one variable produces the next.</span>
                   </div>
                 </div>
               </CardHeader>
@@ -347,6 +348,8 @@ export default function Applications() {
                     if (!from || !to) return null;
                     const labelX = (from.position.x + to.position.x) / 2;
                     const labelY = (from.position.y + to.position.y) / 2 - 8;
+                     const mechanismLabelX = from.position.x === to.position.x ? labelX + 27 : labelX;
+                     const mechanismLabelY = labelY - 17;
                     return (
                       <g key={`${edge.from}-${edge.to}`}>
                         <line
@@ -358,6 +361,9 @@ export default function Applications() {
                           strokeWidth="2.5"
                           markerEnd="url(#causal-arrow)"
                         />
+                         <text x={mechanismLabelX} y={mechanismLabelY} textAnchor="middle" fontSize="9" fontStyle="italic" fill="#64748b">
+                           mechanism
+                         </text>
                         <rect x={labelX - 22} y={labelY - 11} width="44" height="20" rx="10" fill="white" stroke="#e2e8f0" />
                         <text x={labelX} y={labelY + 3} textAnchor="middle" fontSize="11" fontWeight="700" fill={edge.weight < 0 ? "#dc2626" : "#475569"}>
                           {edge.weight > 0 ? "+" : ""}{edge.weight.toFixed(2)}
@@ -367,18 +373,21 @@ export default function Applications() {
                   })}
                   {application.variables.map((variable) => {
                     const value = simulatedValues[variable.id];
-                    const colors = variable.role === "input"
-                      ? { fill: "#eff6ff", stroke: "#93c5fd", text: "#1d4ed8" }
-                      : variable.role === "mechanism"
-                        ? { fill: "#faf5ff", stroke: "#d8b4fe", text: "#7e22ce" }
-                        : { fill: "#ecfdf5", stroke: "#86efac", text: "#047857" };
+                     const isTreatmentOrOutcome = variable.role === "treatment" || variable.role === "outcome";
+                     const roleLabel = variable.role === "treatment" ? "Treatment" : variable.role === "mediator" ? "Mediator" : "Outcome";
+                     const colors = isTreatmentOrOutcome
+                       ? { fill: "#EEEDFB", stroke: "#4F46E5", text: "#3730A3" }
+                       : { fill: "#FFFFFF", stroke: "#C9C8DC", text: "#475569" };
                     return (
                       <g key={variable.id}>
                         <rect x={variable.position.x - 76} y={variable.position.y - 30} width="152" height="60" rx="12" fill={colors.fill} stroke={colors.stroke} strokeWidth="2" />
-                        <text x={variable.position.x} y={variable.position.y - 6} textAnchor="middle" fontSize="12" fontWeight="700" fill={colors.text}>
+                         <text x={variable.position.x} y={variable.position.y - 19} textAnchor="middle" fontSize="9" fontWeight="700" fill={colors.text}>
+                           {roleLabel}
+                         </text>
+                         <text x={variable.position.x} y={variable.position.y - 3} textAnchor="middle" fontSize="12" fontWeight="700" fill={colors.text}>
                           {variable.label}
                         </text>
-                        <text x={variable.position.x} y={variable.position.y + 14} textAnchor="middle" fontSize="12" fontWeight="600" fill="#334155">
+                         <text x={variable.position.x} y={variable.position.y + 17} textAnchor="middle" fontSize="12" fontWeight="600" fill="#334155">
                           {formatValue(value, variable.unit)}
                         </text>
                       </g>
@@ -471,13 +480,11 @@ export default function Applications() {
                         <td className="px-3 py-4 font-semibold text-gray-900 dark:text-white">{variable.label}</td>
                         <td className="px-3 py-4">
                           <span className={`rounded-full px-2 py-1 text-xs font-medium ${
-                            variable.role === "input"
-                              ? "bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-200"
-                              : variable.role === "mechanism"
-                                ? "bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-200"
-                                : "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-200"
+                            variable.role === "treatment" || variable.role === "outcome"
+                              ? "bg-[#EEEDFB] text-[#4F46E5]"
+                              : "border border-[#C9C8DC] bg-white text-slate-600"
                           }`}>
-                            {variable.role}
+                            {variable.role === "treatment" ? "Treatment" : variable.role === "mediator" ? "Mediator" : "Outcome"}
                           </span>
                         </td>
                         <td className="px-3 py-4 text-gray-600 dark:text-gray-300">{formatValue(variable.baseline, variable.unit)}</td>

@@ -1,0 +1,37 @@
+# Replit prompt — fix causal diagram terminology in the application sample
+
+Paste this into Replit's Agent/Assistant, in the project containing the causal diagram sample (the "Care coordination" healthcare example).
+
+---
+
+Find the sample causal diagram component showing the healthcare example with "Care coordination," "Treatment adherence," "Follow-up wait," "Readmission risk," and "Patient outcomes." It currently labels these using three categories: Input, Mechanism, and Outcome. This terminology is incorrect and needs to be fixed throughout the component (labels, tooltips, legend, any accompanying copy, and variable/prop names if they use these terms internally).
+
+## Terminology fix
+
+Replace the three-category model with the correct one:
+
+1. **"Input" → "Treatment"**
+   The node currently labeled "Input" (Care coordination, index 58) should be relabeled "Treatment." Update any legend text, tooltips, or captions that say "Input" to say "Treatment" instead. If there's a short explanatory line under the label, it should read something like: "The variable you can change or intervene on."
+
+2. **"Mechanism" as a node category should be removed. These nodes are "Mediators."**
+   The three nodes currently grouped under "Mechanism" — Treatment adherence (+120%), Follow-up wait (-31 days), Readmission risk (-164%) — should be relabeled "Mediator" (singular label repeated per node, or "Mediators" as a section header if there's a group label). Do not use the word "Mechanism" as a node or category label anywhere in this component.
+
+3. **"Mechanism" now refers only to the edges/arrows, not any node.**
+   Add a small italicized label on the connecting arrows/edges between nodes that says "mechanism." If the diagram is built with SVG lines or a charting/diagramming library (e.g. React Flow, D3, or custom SVG), add a text label positioned along or above each edge. If there's a legend, add a line explaining: "Mechanism — the functional relationship by which one variable produces the next." This replaces any prior legend entry that described "Mechanism" as a node type.
+
+4. **"Outcome" stays as is.**
+   The final node (Patient outcomes, index 395) keeps its "Outcome" label — no change needed there.
+
+## Visual structure
+
+Update the diagram layout so it visually distinguishes Treatment and Outcome nodes from Mediator nodes:
+- Treatment and Outcome nodes: use a tinted/filled background (e.g. light indigo `#EEEDFB` with a `#4F46E5` border)
+- Mediator nodes: use a white/plain background with a lighter gray border (e.g. `#C9C8DC`)
+
+Arrange it so the Treatment node sits on the left, the Outcome node on the right, and the three Mediator nodes sit in between showing the causal path from Treatment to Outcome (Treatment adherence and Follow-up wait both feeding into Readmission risk, which then leads to Outcome) — check the existing component's current arrow structure first and preserve whatever the actual intended causal path is; only fix the labels and node styling if the arrow structure itself is already correct. If you're unsure whether the current arrows represent a chain (A→B→C→D) or a converging structure (A→B, A→C, B and C→D), flag this to me rather than guessing, since the causal structure itself needs to be verified against the actual data relationships, not just the visual style.
+
+## Where else to check
+
+Search the codebase for any other instances of "Input," "Mechanism," or these three variable names used as category labels — this terminology may appear in other example diagrams (retail, marketing, finance) on the same Applications page, not just the healthcare one. List every file where you find "Mechanism" used as a node/category label, and apply the same fix (Mediator for the node, mechanism only as an edge label) consistently across all of them. Show me the list of files changed when done.
+
+Do not change any of the actual numeric values (58, +120%, -31 days, -164%, 395) — only the labels, terminology, and node styling described above.
