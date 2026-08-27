@@ -160,6 +160,53 @@ export default function CausalFoundationModel() {
               </p>
             </div>
 
+            <div className="mb-8 rounded-2xl border border-indigo-100 bg-indigo-50/70 p-5 dark:border-indigo-900/60 dark:bg-indigo-950/30 md:p-7">
+              <p className="text-base leading-relaxed text-gray-800 dark:text-gray-200">
+                <span className="font-semibold text-indigo-900 dark:text-indigo-200">Statistical inference</span> is about finding patterns in what we already observe (<span className="font-medium">What is the relationship if I see X?</span>), while <span className="font-semibold text-purple-900 dark:text-purple-200">causal inference</span> is about understanding what happens when we actively change a system or imagine alternative realities (<span className="font-medium">What happens if I change X?</span>).
+              </p>
+              <p className="mt-4 leading-relaxed text-gray-700 dark:text-gray-300">
+                In mathematical terms this translates to <span className="rounded bg-white px-2 py-1 font-mono text-sm font-semibold text-blue-800 shadow-sm dark:bg-gray-900 dark:text-blue-200">Estimate P(Y∣X)</span> vs. <span className="rounded bg-white px-2 py-1 font-mono text-sm font-semibold text-purple-800 shadow-sm dark:bg-gray-900 dark:text-purple-200">Estimate P(Y∣do(X))</span>. For the first, the observation is sufficient, whereas for the second you need the interventional context.
+              </p>
+            </div>
+
+            <div className="mb-8 grid gap-5 md:grid-cols-2">
+              <div className="rounded-xl border border-blue-100 bg-white/80 p-5 dark:border-blue-900/60 dark:bg-gray-950/40">
+                <div className="mb-4 flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-sm font-bold uppercase tracking-wider text-blue-700 dark:text-blue-300">Observed data</p>
+                    <h3 className="mt-1 text-lg font-bold text-gray-950 dark:text-white">Statistical inference</h3>
+                  </div>
+                  <span className="rounded-md bg-blue-100 px-2 py-1 font-mono text-xs font-semibold text-blue-800 dark:bg-blue-950 dark:text-blue-200">P(Y∣X)</span>
+                </div>
+                <div className="relative h-44 overflow-hidden rounded-lg bg-blue-50/80 p-4 dark:bg-blue-950/30" aria-label="Observed graph with a shared cause">
+                  <div className="absolute left-1/2 top-3 -translate-x-1/2 rounded-full border border-amber-200 bg-amber-100 px-3 py-1 text-xs font-bold text-amber-800 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200">Context U</div>
+                  <div className="absolute bottom-4 left-[18%] rounded-lg border border-blue-200 bg-white px-3 py-2 text-sm font-bold text-blue-800 shadow-sm dark:border-blue-800 dark:bg-gray-900 dark:text-blue-200">X</div>
+                  <div className="absolute bottom-4 right-[18%] rounded-lg border border-blue-200 bg-white px-3 py-2 text-sm font-bold text-blue-800 shadow-sm dark:border-blue-800 dark:bg-gray-900 dark:text-blue-200">Y</div>
+                  <span className="absolute left-[30%] top-[37%] rotate-[25deg] text-lg text-gray-400" aria-hidden="true">↙</span>
+                  <span className="absolute right-[30%] top-[37%] rotate-[-25deg] text-lg text-gray-400" aria-hidden="true">↘</span>
+                  <span className="absolute bottom-[28%] left-1/2 -translate-x-1/2 text-lg text-blue-400" aria-hidden="true">→</span>
+                  <p className="absolute bottom-1 left-0 right-0 text-center text-xs text-gray-500 dark:text-gray-400">Patterns can reflect X, Y, and shared context</p>
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-purple-100 bg-white/80 p-5 dark:border-purple-900/60 dark:bg-gray-950/40">
+                <div className="mb-4 flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-sm font-bold uppercase tracking-wider text-purple-700 dark:text-purple-300">Active intervention</p>
+                    <h3 className="mt-1 text-lg font-bold text-gray-950 dark:text-white">Causal inference</h3>
+                  </div>
+                  <span className="rounded-md bg-purple-100 px-2 py-1 font-mono text-xs font-semibold text-purple-800 dark:bg-purple-950 dark:text-purple-200">P(Y∣do(X))</span>
+                </div>
+                <div className="relative h-44 overflow-hidden rounded-lg bg-purple-50/80 p-4 dark:bg-purple-950/30" aria-label="Intervention graph with X set externally">
+                  <div className="absolute left-1/2 top-3 -translate-x-1/2 rounded-full border border-gray-200 bg-gray-100 px-3 py-1 text-xs font-bold text-gray-500 line-through dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">Context → X</div>
+                  <div className="absolute bottom-4 left-[18%] rounded-lg border border-purple-200 bg-purple-600 px-3 py-2 text-sm font-bold text-white shadow-sm dark:border-purple-500">do(X)</div>
+                  <div className="absolute bottom-4 right-[18%] rounded-lg border border-purple-200 bg-white px-3 py-2 text-sm font-bold text-purple-800 shadow-sm dark:border-purple-800 dark:bg-gray-900 dark:text-purple-200">Y</div>
+                  <span className="absolute bottom-[28%] left-[39%] text-lg font-bold text-purple-500" aria-hidden="true">→</span>
+                  <p className="absolute bottom-1 left-0 right-0 text-center text-xs text-gray-500 dark:text-gray-400">Set X, then trace its effect on Y</p>
+                </div>
+              </div>
+            </div>
+
             <div className="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-700">
               <table className="w-full min-w-[680px] border-collapse text-left text-sm">
                 <thead className="bg-gray-50 dark:bg-gray-800/80">
