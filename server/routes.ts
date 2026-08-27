@@ -6,6 +6,7 @@ import { z } from "zod";
 import { insertProjectSchema, insertUploadedDataSchema, type Variable, type CausalLink, type ProjectResults } from "@shared/schema";
 import { SemiconductorTNCMVAE, predefinedScenarios } from "./huggingface-service";
 import { yahooFinanceService } from "./yahoo-finance-service";
+import { registerAskAnythingRoutes } from "./ask-anything";
 
 // Configure multer for file uploads
 const upload = multer({
@@ -23,6 +24,7 @@ const upload = multer({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  registerAskAnythingRoutes(app);
   
   // Initialize Hugging Face T-NCM-VAE model
   let tncmModel: SemiconductorTNCMVAE | null = null;

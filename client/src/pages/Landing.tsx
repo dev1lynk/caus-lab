@@ -13,6 +13,7 @@ import {
   BookOpen,
   BrainCircuit,
   BriefcaseBusiness,
+  HelpCircle,
   Target,
   LineChart,
   Building2,
@@ -98,6 +99,12 @@ export default function Landing() {
               <Button size="lg" variant="outline" className="px-8 py-4 text-lg">
                 Applications
                 <Globe className="w-5 h-5 ml-2" />
+              </Button>
+            </Link>
+            <Link href="/ask">
+              <Button size="lg" variant="outline" className="px-8 py-4 text-lg">
+                Ask Anything
+                <HelpCircle className="w-5 h-5 ml-2" />
               </Button>
             </Link>
           </div>

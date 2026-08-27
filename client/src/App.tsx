@@ -10,6 +10,10 @@ import Terminology from "@/pages/Terminology";
 import CausalFoundationModel from "@/pages/CausalFoundationModel";
 import OurService from "@/pages/OurService";
 import Applications from "@/pages/Applications";
+import Ask from "@/pages/Ask";
+import Questions from "@/pages/Questions";
+import QuestionDetail from "@/pages/QuestionDetail";
+import AdminQuestions from "@/pages/AdminQuestions";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -22,6 +26,10 @@ function Router() {
       <Route path="/causal-foundation-model" component={CausalFoundationModel} />
       <Route path="/our-service" component={OurService} />
       <Route path="/applications" component={Applications} />
+      <Route path="/ask" component={Ask} />
+      <Route path="/questions" component={Questions} />
+      <Route path="/questions/:slug" component={QuestionDetail} />
+      <Route path="/admin/questions" component={AdminQuestions} />
       <Route component={NotFound} />
     </Switch>
   );

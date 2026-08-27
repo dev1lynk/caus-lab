@@ -28,6 +28,11 @@ export default function Navigation() {
                       <span>Demo</span>
                     </Button>
                   </Link>
+                  <Link href="/ask">
+                    <Button variant="ghost" size="sm" className="flex items-center space-x-2">
+                      <span>Ask Anything</span>
+                    </Button>
+                  </Link>
                 </div>
               </div>
             )}
