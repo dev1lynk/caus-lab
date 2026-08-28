@@ -5,6 +5,7 @@ import {
   BookOpen,
   Check,
   ChevronRight,
+  HelpCircle,
   Search,
   X,
 } from "lucide-react";
@@ -464,11 +465,16 @@ export default function Terminology() {
                       <p className="leading-relaxed text-gray-700 dark:text-gray-300">{selectedTerm.example}</p>
                     </div>
                   </div>
-                  <div className="mt-8 flex items-center justify-between border-t border-gray-100 pt-5 dark:border-gray-800">
+                  <div className="mt-8 flex flex-col items-start gap-4 border-t border-gray-100 pt-5 dark:border-gray-800 sm:flex-row sm:items-center sm:justify-between">
                     <p className="text-xs text-gray-500 dark:text-gray-400">Select another term to continue exploring.</p>
-                    <Link href="/workflow">
-                      <Button variant="outline" size="sm">Open workflow <ChevronRight className="ml-1 h-4 w-4" /></Button>
-                    </Link>
+                    <div className="flex flex-wrap gap-3">
+                      <Link href="/workflow">
+                        <Button variant="outline" size="sm">Open workflow <ChevronRight className="ml-1 h-4 w-4" /></Button>
+                      </Link>
+                      <Link href="/ask">
+                        <Button variant="outline" size="sm">Ask Anything <HelpCircle className="ml-1 h-4 w-4" /></Button>
+                      </Link>
+                    </div>
                   </div>
                 </CardContent>
               ) : (
