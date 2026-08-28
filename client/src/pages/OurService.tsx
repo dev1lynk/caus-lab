@@ -181,7 +181,7 @@ export default function OurService() {
                 </Link>
                 <Link href="/workflow">
                   <Button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
-                    Explore CAUS Lab
+                    Explore CAUS Lab Workflow
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </Link>

@@ -1,8 +1,9 @@
 import { useState } from "react";
 import Navigation from "@/components/Navigation";
 import ProjectWorkflow from "@/components/ProjectWorkflow";
-import SampleProjectsSection from "@/components/SampleProjectsSection";
 import DocumentationContent from "@/components/DocumentationContent";
+import SampleProjectsSection from "@/components/SampleProjectsSection";
+import WorkflowGuidance from "@/components/WorkflowGuidance";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function WorkflowPage() {
@@ -41,6 +42,7 @@ export default function WorkflowPage() {
 
           <TabsContent value="workflow" className="space-y-8">
             <ProjectWorkflow />
+            <WorkflowGuidance />
           </TabsContent>
 
           <TabsContent value="samples" className="space-y-8">

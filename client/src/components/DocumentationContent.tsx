@@ -10,9 +10,7 @@ import {
   Settings, 
   BarChart3,
   FileText,
-  Lightbulb,
   Target,
-  Zap,
   Download,
   ExternalLink
 } from "lucide-react";
@@ -31,11 +29,10 @@ export default function DocumentationContent() {
       </div>
 
       <Tabs defaultValue="getting-started" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="getting-started">Getting Started</TabsTrigger>
           <TabsTrigger value="tutorials">Tutorials</TabsTrigger>
           <TabsTrigger value="api-reference">API Reference</TabsTrigger>
-          <TabsTrigger value="best-practices">Best Practices</TabsTrigger>
         </TabsList>
 
         <TabsContent value="getting-started" className="space-y-6">
@@ -378,86 +375,6 @@ export default function DocumentationContent() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="best-practices" className="space-y-6">
-          <div className="grid gap-6">
-            <Card className="border-0 shadow-lg">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Lightbulb className="w-5 h-5 text-yellow-600" />
-                  Modeling Best Practices
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <h5 className="font-medium mb-3 text-green-600">✓ Do These</h5>
-                    <ul className="space-y-2 text-sm">
-                      <li>• Start with domain knowledge when defining variables</li>
-                      <li>• Use sufficient historical data (6+ months)</li>
-                      <li>• Validate causal assumptions with subject experts</li>
-                      <li>• Test multiple scenario configurations</li>
-                      <li>• Monitor model performance regularly</li>
-                      <li>• Document your modeling decisions</li>
-                    </ul>
-                  </div>
-                  <div>
-                    <h5 className="font-medium mb-3 text-red-600">✗ Avoid These</h5>
-                    <ul className="space-y-2 text-sm">
-                      <li>• Including too many highly correlated variables</li>
-                      <li>• Making causal claims without proper validation</li>
-                      <li>• Using insufficient data for training</li>
-                      <li>• Ignoring outliers without investigation</li>
-                      <li>• Over-interpreting short-term predictions</li>
-                      <li>• Neglecting model uncertainty estimates</li>
-                    </ul>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-0 shadow-lg">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Zap className="w-5 h-5 text-purple-600" />
-                  Performance Optimization
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
-                    <h6 className="font-medium mb-2">Model Training Tips</h6>
-                    <ul className="text-sm space-y-1">
-                      <li>• Use balanced datasets with representative samples</li>
-                      <li>• Implement proper data preprocessing pipelines</li>
-                      <li>• Monitor training convergence metrics</li>
-                      <li>• Apply regularization to prevent overfitting</li>
-                    </ul>
-                  </div>
-
-                  <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
-                    <h6 className="font-medium mb-2">Prediction Accuracy</h6>
-                    <ul className="text-sm space-y-1">
-                      <li>• Validate predictions against holdout data</li>
-                      <li>• Use multiple evaluation metrics (MAPE, RMSE, etc.)</li>
-                      <li>• Consider forecast horizons appropriate for your use case</li>
-                      <li>• Regularly retrain models with new data</li>
-                    </ul>
-                  </div>
-
-                  <div className="bg-orange-50 dark:bg-orange-900/20 p-4 rounded-lg">
-                    <h6 className="font-medium mb-2">Scenario Design</h6>
-                    <ul className="text-sm space-y-1">
-                      <li>• Design realistic intervention scenarios</li>
-                      <li>• Test edge cases and extreme conditions</li>
-                      <li>• Compare multiple alternative strategies</li>
-                      <li>• Document assumptions and limitations</li>
-                    </ul>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
       </Tabs>
 
       {/* Quick Links */}
