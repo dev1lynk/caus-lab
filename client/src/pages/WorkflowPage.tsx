@@ -1,14 +1,8 @@
-import { useState } from "react";
 import Navigation from "@/components/Navigation";
 import ProjectWorkflow from "@/components/ProjectWorkflow";
-import DocumentationContent from "@/components/DocumentationContent";
-import SampleProjectsSection from "@/components/SampleProjectsSection";
 import WorkflowGuidance from "@/components/WorkflowGuidance";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function WorkflowPage() {
-  const [activeTab, setActiveTab] = useState("workflow");
-
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
@@ -18,41 +12,14 @@ export default function WorkflowPage() {
             CAUS Lab Platform
           </h1>
           <p className="text-muted-foreground">
-            Explore our workflow, sample projects, and comprehensive documentation
+            Follow the complete CAUS Lab process from data upload to actionable insights.
           </p>
         </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <div className="overflow-x-auto">
-            <TabsList className="flex w-max min-w-full justify-start md:grid md:grid-cols-3 gap-1">
-              <TabsTrigger value="workflow" className="text-xs md:text-sm px-2 md:px-4 whitespace-nowrap">
-                <span className="hidden md:inline">Project Workflow</span>
-                <span className="md:hidden">Workflow</span>
-              </TabsTrigger>
-              <TabsTrigger value="samples" className="text-xs md:text-sm px-2 md:px-4 whitespace-nowrap">
-                <span className="hidden md:inline">Sample Projects</span>
-                <span className="md:hidden">Projects</span>
-              </TabsTrigger>
-              <TabsTrigger value="documentation" className="text-xs md:text-sm px-2 md:px-4 whitespace-nowrap">
-                <span className="hidden md:inline">Documentation</span>
-                <span className="md:hidden">Docs</span>
-              </TabsTrigger>
-            </TabsList>
-          </div>
-
-          <TabsContent value="workflow" className="space-y-8">
-            <ProjectWorkflow />
-            <WorkflowGuidance />
-          </TabsContent>
-
-          <TabsContent value="samples" className="space-y-8">
-            <SampleProjectsSection />
-          </TabsContent>
-
-          <TabsContent value="documentation" className="space-y-8">
-            <DocumentationContent />
-          </TabsContent>
-        </Tabs>
+        <div className="space-y-8">
+          <ProjectWorkflow />
+          <WorkflowGuidance />
+        </div>
       </main>
     </div>
   );

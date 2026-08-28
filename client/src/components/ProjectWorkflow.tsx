@@ -1,7 +1,4 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Link } from "wouter";
 import { 
   Upload, 
   Settings, 
@@ -16,7 +13,7 @@ import {
   Database,
   GitBranch,
   Activity,
-  Target
+  Target,
 } from "lucide-react";
 
 export default function ProjectWorkflow() {
@@ -194,101 +191,6 @@ export default function ProjectWorkflow() {
         </div>
       </div>
 
-      {/* Demo Showcase */}
-      <div className="grid md:grid-cols-2 gap-8 mt-12">
-        <Card className="border-0 shadow-xl bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20">
-          <CardHeader>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
-                <Target className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <CardTitle className="text-xl">STM Stock Prediction Demo</CardTitle>
-                <p className="text-sm text-gray-600 dark:text-gray-300">
-                  See CAUS Lab in action with semiconductor stock analysis
-                </p>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-blue-600">15</div>
-                <div className="text-xs text-gray-500">Variables</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-green-600">92%</div>
-                <div className="text-xs text-gray-500">Accuracy</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-purple-600">Real-time</div>
-                <div className="text-xs text-gray-500">Updates</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-orange-600">T-NCM-VAE</div>
-                <div className="text-xs text-gray-500">AI Model</div>
-              </div>
-            </div>
-            <Link href="/stm-demo">
-              <Button className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700">
-                Try STM Demo
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            </Link>
-          </CardContent>
-        </Card>
-
-        <Card className="border-0 shadow-xl bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20">
-          <CardHeader>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-green-600 to-emerald-600 rounded-lg flex items-center justify-center">
-                <Brain className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <CardTitle className="text-xl">Custom Industry Models</CardTitle>
-                <p className="text-sm text-gray-600 dark:text-gray-300">
-                  Build specialized models for your specific use case
-                </p>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Badge variant="outline" className="text-blue-600 border-blue-200">Finance</Badge>
-              <Badge variant="outline" className="text-purple-600 border-purple-200">Manufacturing</Badge>
-              <Badge variant="outline" className="text-green-600 border-green-200">Logistics</Badge>
-              <Badge variant="outline" className="text-orange-600 border-orange-200">Healthcare</Badge>
-            </div>
-            <p className="text-sm text-gray-600 dark:text-gray-300">
-              Upload your data and let CAUS Lab create custom predictive models tailored to your industry's unique patterns and requirements.
-            </p>
-            <Button variant="outline" className="w-full border-green-200 text-green-600 hover:bg-green-50">
-              Start Custom Project
-              <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Bottom CTA */}
-      <div className="text-center mt-12 p-8 bg-gradient-to-r from-blue-50 via-purple-50 to-indigo-50 dark:from-blue-900/20 dark:via-purple-900/20 dark:to-indigo-900/20 rounded-2xl">
-        <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-          Ready to Transform Your Decision-Making?
-        </h3>
-        <p className="text-gray-600 dark:text-gray-300 mb-6 max-w-2xl mx-auto">
-          Join the future of predictive analytics with CAUS Lab. Start building scenarios that
-          shape your business outcomes today.
-        </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 px-8">
-            Get Started Now
-            <Zap className="w-4 h-4 ml-2" />
-          </Button>
-          <Button size="lg" variant="outline" className="px-8">
-            Schedule Demo
-          </Button>
-        </div>
-      </div>
     </div>
   );
 }
