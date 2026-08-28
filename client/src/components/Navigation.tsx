@@ -16,21 +16,31 @@ export default function Navigation() {
               <span className="text-xl font-bold text-foreground">CAUS Lab</span>
             </Link>
             {location !== "/" && (
-              <div className="hidden md:block ml-10">
-                <div className="flex items-baseline space-x-4">
-                  <Link href="/workflow">
-                    <Button variant="ghost" size="sm" className="flex items-center space-x-2">
-                      <span>Workflow</span>
+              <div className="hidden md:block ml-4 lg:ml-8">
+                <div className="flex items-baseline gap-1 xl:gap-2">
+                  <Link href="/terminology">
+                    <Button variant="ghost" size="sm" className="whitespace-nowrap px-2 text-xs lg:text-sm">
+                      Terminology
                     </Button>
                   </Link>
-                  <Link href="/stm-demo">
-                    <Button variant="ghost" size="sm" className="flex items-center space-x-2">
-                      <span>Demo</span>
+                  <Link href="/causal-foundation-model">
+                    <Button variant="ghost" size="sm" className="whitespace-nowrap px-2 text-xs lg:text-sm">
+                      What Is a Causal Foundation Model?
+                    </Button>
+                  </Link>
+                  <Link href="/our-service">
+                    <Button variant="ghost" size="sm" className="whitespace-nowrap px-2 text-xs lg:text-sm">
+                      Our Service
+                    </Button>
+                  </Link>
+                  <Link href="/applications">
+                    <Button variant="ghost" size="sm" className="whitespace-nowrap px-2 text-xs lg:text-sm">
+                      Applications
                     </Button>
                   </Link>
                   <Link href="/ask">
-                    <Button variant="ghost" size="sm" className="flex items-center space-x-2">
-                      <span>Ask Anything</span>
+                    <Button variant="ghost" size="sm" className="whitespace-nowrap px-2 text-xs lg:text-sm">
+                      Ask Anything
                     </Button>
                   </Link>
                 </div>
