@@ -1,5 +1,5 @@
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import CausalFoundationHero from "@/components/CausalFoundationHero";
 import { Link } from "wouter";
 import { 
   Brain, 
@@ -8,9 +8,6 @@ import {
   Globe, 
   Shield,
   CheckCircle,
-  BookOpen,
-  BrainCircuit,
-  BriefcaseBusiness,
   HelpCircle,
   Target,
   LineChart,
@@ -37,59 +34,18 @@ export default function Landing() {
               <p className="text-xs text-gray-600 dark:text-gray-400">Generative Scenario Simulation</p>
             </div>
           </div>
-          <Link href="/ask">
-            <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+          <Link
+            href="/ask"
+            className="inline-flex items-center rounded-md bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-transform hover:-translate-y-0.5 hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          >
               Ask Anything
               <HelpCircle className="w-4 h-4 ml-2" />
-            </Button>
           </Link>
         </div>
       </header>
 
       {/* Hero Section */}
-      <section className="container mx-auto px-4 py-16 text-center">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent leading-tight">
-            Welcome to CAUS Lab
-          </h1>
-          
-          <h2 className="text-2xl md:text-3xl font-semibold text-gray-800 dark:text-gray-200 mb-8">
-            Unlock the Power of Generative Scenario Simulation
-          </h2>
-          
-          <p className="text-xl text-gray-600 dark:text-gray-300 mb-12 leading-relaxed max-w-3xl mx-auto">
-            Step into a new era of decision-making with CAUS Lab, the generative AI platform that empowers you to 
-            explore, simulate, and analyze complex time-series scenarios—no matter your industry or use case.
-          </p>
-          
-          <div className="flex flex-col flex-wrap justify-center gap-4 sm:flex-row">
-            <Link href="/terminology">
-              <Button size="lg" variant="outline" className="px-8 py-4 text-lg">
-                Terminology
-                <BookOpen className="w-5 h-5 ml-2" />
-              </Button>
-            </Link>
-            <Link href="/causal-foundation-model">
-              <Button size="lg" variant="outline" className="px-8 py-4 text-lg">
-                What Is a Causal Foundation Model?
-                <BrainCircuit className="w-5 h-5 ml-2 shrink-0" />
-              </Button>
-            </Link>
-            <Link href="/our-service">
-              <Button size="lg" variant="outline" className="px-8 py-4 text-lg">
-                Our Service
-                <BriefcaseBusiness className="w-5 h-5 ml-2" />
-              </Button>
-            </Link>
-            <Link href="/applications">
-              <Button size="lg" variant="outline" className="px-8 py-4 text-lg">
-                Applications
-                <Globe className="w-5 h-5 ml-2" />
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
+      <CausalFoundationHero />
 
       {/* Key Features */}
       <section className="container mx-auto px-4 py-16">
