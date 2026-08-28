@@ -38,10 +38,10 @@ export default function Landing() {
               <p className="text-xs text-gray-600 dark:text-gray-400">Generative Scenario Simulation</p>
             </div>
           </div>
-          <Link href="/workflow">
+          <Link href="/ask">
             <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-              Get Started
-              <ArrowRight className="w-4 h-4 ml-2" />
+              Ask Anything
+              <HelpCircle className="w-4 h-4 ml-2" />
             </Button>
           </Link>
         </div>
