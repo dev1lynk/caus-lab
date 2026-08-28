@@ -508,7 +508,7 @@ export default function Applications() {
               </Link>
               <Link href="/workflow">
                 <Button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
-                  Open workflow
+                  Explore CAUS Lab workflow
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>

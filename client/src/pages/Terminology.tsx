@@ -469,7 +469,10 @@ export default function Terminology() {
                     <p className="text-xs text-gray-500 dark:text-gray-400">Select another term to continue exploring.</p>
                     <div className="flex flex-wrap gap-3">
                       <Link href="/workflow">
-                        <Button variant="outline" size="sm">Open workflow <ChevronRight className="ml-1 h-4 w-4" /></Button>
+                        <Button size="sm" className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+                          Explore CAUS Lab workflow
+                          <ChevronRight className="ml-1 h-4 w-4" />
+                        </Button>
                       </Link>
                       <Link href="/ask">
                         <Button variant="outline" size="sm">Ask Anything <HelpCircle className="ml-1 h-4 w-4" /></Button>
