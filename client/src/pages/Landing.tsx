@@ -7,7 +7,6 @@ import {
   Zap,
   Globe, 
   Shield,
-  ArrowRight,
   CheckCircle,
   BookOpen,
   BrainCircuit,
@@ -86,12 +85,6 @@ export default function Landing() {
               <Button size="lg" variant="outline" className="px-8 py-4 text-lg">
                 Applications
                 <Globe className="w-5 h-5 ml-2" />
-              </Button>
-            </Link>
-            <Link href="/ask">
-              <Button size="lg" variant="outline" className="px-8 py-4 text-lg">
-                Ask Anything
-                <HelpCircle className="w-5 h-5 ml-2" />
               </Button>
             </Link>
           </div>
@@ -380,13 +373,6 @@ export default function Landing() {
             Join forward-thinking organizations already using CAUS Lab to make better decisions, 
             reduce risks, and unlock new opportunities through advanced scenario simulation.
           </p>
-          
-          <Link href="/ask">
-            <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 px-12 py-4 text-lg">
-              Ask Anything
-              <HelpCircle className="w-5 h-5 ml-2" />
-            </Button>
-          </Link>
           
         </div>
       </section>
