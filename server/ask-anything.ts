@@ -8,6 +8,7 @@ import {
 } from "@shared/schema";
 import { db } from "./db";
 import { sendAndAuditQuestionEmail } from "./email";
+import { syncQuestionToAirtable } from "./airtable";
 import { z } from "zod";
 
 const questionStatuses = ["new", "in_review", "answered", "published", "declined"] as const;
@@ -188,6 +189,8 @@ export function registerAskAnythingRoutes(app: Express): void {
           company: input.company || null,
         })
         .returning();
+
+      await syncQuestionToAirtable(question);
 
       await sendAndAuditQuestionEmail(question.id, "confirmation", {
         to: question.email,
