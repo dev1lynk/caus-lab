@@ -68,7 +68,7 @@ export default function ProjectWorkflow() {
       borderColor: "border-green-200 dark:border-green-700",
       features: [
         "Neural causal modeling",
-        "Variational autoencoder training",
+        "Prior-fitted network training",
         "Pattern recognition",
         "Real-time model updates"
       ],
