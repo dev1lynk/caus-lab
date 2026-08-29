@@ -60,7 +60,7 @@ export default function ProjectWorkflow() {
     },
     {
       step: 3,
-      title: "T-NCM-VAE Model Training",
+      title: "Temporal Causal Foundation Model training",
       description: "Our advanced AI model learns the causal patterns in your data",
       icon: Brain,
       color: "from-green-500 to-emerald-500",
