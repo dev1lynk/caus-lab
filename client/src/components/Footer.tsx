@@ -1,4 +1,5 @@
-import { ChartGantt, Linkedin } from "lucide-react";
+import { ChartGantt } from "lucide-react";
+import linkedinIcon from "@assets/linkedin-svgrepo-com_1790100277221.svg";
 
 export default function Footer() {
   return (
@@ -23,7 +24,7 @@ export default function Footer() {
               aria-label="CAUS Lab on LinkedIn"
               className="hover:text-foreground transition-colors"
             >
-              <Linkedin className="h-5 w-5" aria-hidden="true" />
+              <img src={linkedinIcon} alt="" className="h-5 w-5" aria-hidden="true" />
             </a>
           </div>
         </div>

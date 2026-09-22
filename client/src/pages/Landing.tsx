@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "wouter";
+import linkedinIcon from "@assets/linkedin-svgrepo-com_1790100277221.svg";
 import { 
   Brain, 
   TrendingUp, 
@@ -19,8 +20,7 @@ import {
   Truck,
   PiggyBank,
   AlertTriangle,
-  Users,
-  Linkedin
+  Users
 } from "lucide-react";
 
 export default function Landing() {
@@ -402,7 +402,7 @@ export default function Landing() {
                 aria-label="CAUS Lab on LinkedIn"
                 className="inline-flex text-gray-400 transition-colors hover:text-white"
               >
-                <Linkedin className="h-5 w-5" aria-hidden="true" />
+                <img src={linkedinIcon} alt="" className="h-5 w-5" aria-hidden="true" />
               </a>
             </div>
           </div>
