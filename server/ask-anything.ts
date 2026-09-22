@@ -222,7 +222,7 @@ export function registerAskAnythingRoutes(app: Express): void {
       email: input.email,
       firstName: input.firstName || null,
       company: input.company || null,
-      role: input.role,
+      role: input.role ?? null,
     });
 
     if (!notified) {
