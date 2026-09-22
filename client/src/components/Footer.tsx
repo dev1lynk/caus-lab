@@ -1,4 +1,4 @@
-import { ChartGantt } from "lucide-react";
+import { ChartGantt, Linkedin } from "lucide-react";
 
 export default function Footer() {
   return (
@@ -15,6 +15,15 @@ export default function Footer() {
             </a>
             <a href="#" className="hover:text-foreground transition-colors">
               Support
+            </a>
+            <a
+              href="https://www.linkedin.com/company/causlab/"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="CAUS Lab on LinkedIn"
+              className="hover:text-foreground transition-colors"
+            >
+              <Linkedin className="h-5 w-5" aria-hidden="true" />
             </a>
           </div>
         </div>
