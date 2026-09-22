@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Brain, User } from "lucide-react";
+import { Brain } from "lucide-react";
 import { Link, useLocation } from "wouter";
 
 export default function Navigation() {
@@ -46,13 +45,6 @@ export default function Navigation() {
                 </div>
               </div>
             )}
-          </div>
-          <div className="flex items-center space-x-4">
-            <Avatar className="h-8 w-8">
-              <AvatarFallback>
-                <User className="h-4 w-4" />
-              </AvatarFallback>
-            </Avatar>
           </div>
         </div>
       </div>
