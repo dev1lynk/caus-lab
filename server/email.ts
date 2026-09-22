@@ -1,5 +1,56 @@
 import { db } from "./db";
 import { emailEvents } from "@shared/schema";
+import nodemailer from "nodemailer";
+
+const smtpTransporter = process.env.SMTP_HOST
+  ? nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: Number(process.env.SMTP_PORT) || 465,
+      secure: true,
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+    })
+  : null;
+
+interface TeamNotificationInput {
+  questionText: string;
+  email: string;
+  firstName: string | null;
+  company: string | null;
+  role: string | null;
+}
+
+export async function sendTeamNotificationEmail(input: TeamNotificationInput): Promise<boolean> {
+  if (!smtpTransporter) {
+    console.warn("[email] SMTP not configured, skipping team notification");
+    return false;
+  }
+
+  const text = [
+    `New enquiry from ${input.firstName || "(no name given)"}`,
+    `Email: ${input.email}`,
+    input.company ? `Company: ${input.company}` : null,
+    input.role ? `Role: ${input.role}` : null,
+    "",
+    "Question:",
+    input.questionText,
+  ].filter(Boolean).join("\n");
+
+  try {
+    await smtpTransporter.sendMail({
+      from: process.env.SMTP_USER,
+      to: "euston@causlab.com, dennis@causlab.com",
+      subject: "New enquiry on causlab.com",
+      text,
+    });
+    return true;
+  } catch (error) {
+    console.error("[email] Failed to send team notification:", error);
+    return false;
+  }
+}
 
 type EmailType = "confirmation" | "answered_notification";
 
