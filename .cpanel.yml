@@ -2,4 +2,3 @@ deployment:
   tasks:
     - export DEPLOYPATH=/home/causnxpa/caus-lab-app/
     - /bin/cp -R * $DEPLOYPATH
-    - /bin/bash -c "source /home/causnxpa/nodevenv/caus-lab-app/20/bin/activate && cd /home/causnxpa/caus-lab-app && npm install --include=dev && npm run build"
