@@ -1,4 +1,4 @@
-import { HfInference } from '@huggingface/inference';
+import { HfInference } from "@huggingface/inference";
 
 interface CounterfactualRequest {
   input_data: number[][];
@@ -9,7 +9,7 @@ interface CounterfactualRequest {
 }
 
 interface CounterfactualResult {
-  status: 'success' | 'error';
+  status: "success" | "error";
   scenario_name?: string;
   original_series?: number[][];
   counterfactual_series?: number[][];
@@ -27,7 +27,7 @@ export class SemiconductorTNCMVAE {
   private hf: HfInference;
   private variableNames = [
     "stm_operational_regime",
-    "stm_cumulative_shipments", 
+    "stm_cumulative_shipments",
     "stm_7day_momentum",
     "stm_days_since_shipment",
     "stm_stock_price",
@@ -40,7 +40,7 @@ export class SemiconductorTNCMVAE {
     "eur_usd_rate",
     "stm_forecast_step",
     "stm_forecast_regime",
-    "market_volatility"
+    "market_volatility",
   ];
 
   constructor(token?: string) {
@@ -51,20 +51,33 @@ export class SemiconductorTNCMVAE {
     this.hf = new HfInference(hfToken);
   }
 
-  async generateCounterfactual(request: CounterfactualRequest): Promise<CounterfactualResult> {
+  async generateCounterfactual(
+    request: CounterfactualRequest,
+  ): Promise<CounterfactualResult> {
     try {
       // Validate input data format
-      if (!Array.isArray(request.input_data) || request.input_data.length !== 20) {
-        throw new Error("Input data must be a 20x15 array (20 time steps, 15 variables)");
+      if (
+        !Array.isArray(request.input_data) ||
+        request.input_data.length !== 20
+      ) {
+        throw new Error(
+          "Input data must be a 20x15 array (20 time steps, 15 variables)",
+        );
       }
 
-      if (!request.input_data.every(row => Array.isArray(row) && row.length === 15)) {
+      if (
+        !request.input_data.every(
+          (row) => Array.isArray(row) && row.length === 15,
+        )
+      ) {
         throw new Error("Each time step must have exactly 15 variables");
       }
 
       // Validate intervention variable
       if (!this.variableNames.includes(request.intervention_variable)) {
-        throw new Error(`Invalid intervention variable. Must be one of: ${this.variableNames.join(', ')}`);
+        throw new Error(
+          `Invalid intervention variable. Must be one of: ${this.variableNames.join(", ")}`,
+        );
       }
 
       // Validate intervention time
@@ -78,11 +91,11 @@ export class SemiconductorTNCMVAE {
         request.input_data,
         request.intervention_variable,
         request.intervention_value,
-        request.intervention_time
+        request.intervention_time,
       );
 
       return {
-        status: 'success',
+        status: "success",
         scenario_name: request.scenario_name,
         original_series: request.input_data,
         counterfactual_series: counterfactual,
@@ -90,14 +103,14 @@ export class SemiconductorTNCMVAE {
         intervention: {
           variable: request.intervention_variable,
           value: request.intervention_value,
-          time: request.intervention_time
-        }
+          time: request.intervention_time,
+        },
       };
-
     } catch (error) {
       return {
-        status: 'error',
-        message: error instanceof Error ? error.message : 'Unknown error occurred'
+        status: "error",
+        message:
+          error instanceof Error ? error.message : "Unknown error occurred",
       };
     }
   }
@@ -106,48 +119,61 @@ export class SemiconductorTNCMVAE {
     inputData: number[][],
     interventionVariable: string,
     interventionValue: number,
-    interventionTime: number
+    interventionTime: number,
   ): number[][] {
     // Create a deep copy of the input data
-    const counterfactual = inputData.map(row => [...row]);
-    
+    const counterfactual = inputData.map((row) => [...row]);
+
     // Find the variable index
     const variableIndex = this.variableNames.indexOf(interventionVariable);
-    
+
     // Apply intervention and propagate effects
     for (let t = interventionTime; t < 20; t++) {
       // Apply direct intervention
       counterfactual[t][variableIndex] += interventionValue;
-      
+
       // Simulate causal effects on related variables
-      this.applyCausalEffects(counterfactual[t], interventionVariable, interventionValue, t - interventionTime);
+      this.applyCausalEffects(
+        counterfactual[t],
+        interventionVariable,
+        interventionValue,
+        t - interventionTime,
+      );
     }
-    
+
     return counterfactual;
   }
 
-  private applyCausalEffects(timeStep: number[], interventionVariable: string, interventionValue: number, timeSinceIntervention: number) {
+  private applyCausalEffects(
+    timeStep: number[],
+    interventionVariable: string,
+    interventionValue: number,
+    timeSinceIntervention: number,
+  ) {
     // Define causal relationships between semiconductor variables
-    const causalRelationships: Record<string, Array<{target: string; coefficient: number}>> = {
-      'oil_price': [
-        { target: 'stm_stock_price', coefficient: -0.3 },
-        { target: 'market_volatility', coefficient: 0.4 }
+    const causalRelationships: Record<
+      string,
+      Array<{ target: string; coefficient: number }>
+    > = {
+      oil_price: [
+        { target: "stm_stock_price", coefficient: -0.3 },
+        { target: "market_volatility", coefficient: 0.4 },
       ],
-      'interest_rate': [
-        { target: 'stm_stock_price', coefficient: -0.5 },
-        { target: 'nasdaq_index', coefficient: -0.4 },
-        { target: 'soxx_etf', coefficient: -0.4 }
+      interest_rate: [
+        { target: "stm_stock_price", coefficient: -0.5 },
+        { target: "nasdaq_index", coefficient: -0.4 },
+        { target: "soxx_etf", coefficient: -0.4 },
       ],
-      'nasdaq_index': [
-        { target: 'stm_stock_price', coefficient: 0.7 },
-        { target: 'ti_stock_price', coefficient: 0.6 },
-        { target: 'infineon_stock_price', coefficient: 0.6 }
+      nasdaq_index: [
+        { target: "stm_stock_price", coefficient: 0.7 },
+        { target: "ti_stock_price", coefficient: 0.6 },
+        { target: "infineon_stock_price", coefficient: 0.6 },
       ],
-      'stm_operational_regime': [
-        { target: 'stm_cumulative_shipments', coefficient: 0.8 },
-        { target: 'stm_7day_momentum', coefficient: 0.6 },
-        { target: 'stm_stock_price', coefficient: 0.4 }
-      ]
+      stm_operational_regime: [
+        { target: "stm_cumulative_shipments", coefficient: 0.8 },
+        { target: "stm_7day_momentum", coefficient: 0.6 },
+        { target: "stm_stock_price", coefficient: 0.4 },
+      ],
     };
 
     const effects = causalRelationships[interventionVariable];
@@ -156,7 +182,7 @@ export class SemiconductorTNCMVAE {
     // Apply decay factor based on time since intervention
     const decayFactor = Math.exp(-0.1 * timeSinceIntervention);
 
-    effects.forEach(effect => {
+    effects.forEach((effect) => {
       const targetIndex = this.variableNames.indexOf(effect.target);
       if (targetIndex !== -1) {
         const impact = interventionValue * effect.coefficient * decayFactor;
@@ -177,40 +203,40 @@ export class SemiconductorTNCMVAE {
           description: "What if STM increased operational activity?",
           intervention_variable: "stm_operational_regime",
           intervention_value: 2.0,
-          intervention_time: 10
+          intervention_time: 10,
         },
         {
           name: "Oil Price Shock",
           description: "What if oil prices dropped significantly?",
           intervention_variable: "oil_price",
           intervention_value: -1.5,
-          intervention_time: 8
+          intervention_time: 8,
         },
         {
           name: "Interest Rate Cut",
           description: "What if interest rates were reduced?",
           intervention_variable: "interest_rate",
           intervention_value: -1.0,
-          intervention_time: 5
+          intervention_time: 5,
         },
         {
           name: "Market Rally",
           description: "What if NASDAQ surged?",
           intervention_variable: "nasdaq_index",
           intervention_value: 2.0,
-          intervention_time: 7
-        }
-      ]
+          intervention_time: 7,
+        },
+      ],
     };
   }
 
   // Generate sample data for testing
   generateSampleData(): number[][] {
     const data: number[][] = [];
-    
+
     for (let t = 0; t < 20; t++) {
       const row: number[] = [];
-      
+
       for (let v = 0; v < 15; v++) {
         // Generate realistic time series data with trends
         const trend = 0.1 * t;
@@ -218,10 +244,10 @@ export class SemiconductorTNCMVAE {
         const baseValue = Math.sin(t * 0.3) + trend + noise;
         row.push(parseFloat(baseValue.toFixed(4)));
       }
-      
+
       data.push(row);
     }
-    
+
     return data;
   }
 }
@@ -233,7 +259,7 @@ export const predefinedScenarios = [
     intervention_variable: "stm_operational_regime",
     intervention_value: 2.0,
     intervention_time: 10,
-    category: "operational"
+    category: "operational",
   },
   {
     name: "Oil Price Shock",
@@ -241,7 +267,7 @@ export const predefinedScenarios = [
     intervention_variable: "oil_price",
     intervention_value: -1.5,
     intervention_time: 8,
-    category: "market"
+    category: "market",
   },
   {
     name: "Interest Rate Cut",
@@ -249,7 +275,7 @@ export const predefinedScenarios = [
     intervention_variable: "interest_rate",
     intervention_value: -1.0,
     intervention_time: 5,
-    category: "monetary"
+    category: "monetary",
   },
   {
     name: "Market Rally",
@@ -257,7 +283,7 @@ export const predefinedScenarios = [
     intervention_variable: "nasdaq_index",
     intervention_value: 2.0,
     intervention_time: 7,
-    category: "market"
+    category: "market",
   },
   {
     name: "Supply Chain Optimization",
@@ -265,6 +291,6 @@ export const predefinedScenarios = [
     intervention_variable: "stm_7day_momentum",
     intervention_value: 1.5,
     intervention_time: 6,
-    category: "operational"
-  }
+    category: "operational",
+  },
 ];
